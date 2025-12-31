@@ -1,0 +1,344 @@
+{
+  "weekMetadata": {
+    "weekNumber": 1,
+    "phase": "GPP",
+    "phaseWeek": 1,
+    "startDate": "2025-01-06",
+    "endDate": "2025-01-12",
+    "athleteName": "Rahul Sharma",
+    "primaryFocus": "Foundation Building",
+    "loadLevel": "70%",
+    "deloadWeek": false
+  },
+  "weeklyTargets": {
+    "sprintVolume": "400-500m",
+    "tempoVolume": "2000m",
+    "strengthSessions": 3,
+    "plyoContacts": 60,
+    "technicalDrills": "Daily"
+  },
+  "dailySchedule": {
+    "monday": {
+      "date": "2025-01-06",
+      "dayType": "HIGH CNS",
+      "sessions": [
+        {
+          "time": "06:30 AM",
+          "type": "Track - Acceleration",
+          "duration": "90 min",
+          "warmUp": {
+            "duration": "20 min",
+            "exercises": [
+              "Jog 400m",
+              "Dynamic stretches (knee hugs, quad stretch, RDL walk)",
+              "Activation (glute bridges 2x10, clamshells 2x12)",
+              "Sprint drills (A-March, A-Skip, B-Skip) 2x30m each",
+              "Build-ups 4x50m (50% → 80%)"
+            ]
+          },
+          "mainWorkout": {
+            "exercises": [
+              {"name": "Block starts to 10m", "sets": 4, "intensity": "70%", "rest": "2 min", "cues": ["Push against blocks", "45° body angle"]},
+              {"name": "3-point start to 20m", "sets": 4, "intensity": "75%", "rest": "3 min", "cues": ["Patience in drive", "Arm-leg coordination"]},
+              {"name": "Standing start to 30m", "sets": 3, "intensity": "80%", "rest": "4 min", "cues": ["Gradual rise", "Drive with hips"]}
+            ],
+            "totalVolume": "190m"
+          },
+          "coolDown": {
+            "duration": "10 min",
+            "exercises": ["Light jog 400m", "Static stretches (hamstrings, hip flexors, quads) 30s each", "Foam rolling 5 min"]
+          }
+        },
+        {
+          "time": "05:00 PM",
+          "type": "Strength - Lower Body",
+          "duration": "75 min",
+          "warmUp": {
+            "duration": "10 min",
+            "exercises": ["Bike 5 min", "Hip circles", "Goblet squats 2x8", "Lunges 2x6 each"]
+          },
+          "mainWorkout": {
+            "exercises": [
+              {"name": "Back Squat", "sets": 4, "reps": 6, "load": "75% (112.5 kg)", "rest": "3 min", "tempo": "3-0-1-0"},
+              {"name": "Romanian Deadlift", "sets": 3, "reps": 8, "load": "65% (117 kg)", "rest": "2.5 min", "tempo": "3-0-1-0"},
+              {"name": "Hip Thrust", "sets": 3, "reps": 10, "load": "70% (140 kg)", "rest": "2 min"},
+              {"name": "Walking Lunges", "sets": 3, "reps": "8 each", "load": "30 kg DBs", "rest": "90s"},
+              {"name": "Calf Raises", "sets": 3, "reps": 15, "load": "BW + 40 kg", "rest": "60s"}
+            ]
+          },
+          "coreWork": {
+            "exercises": [
+              {"name": "Plank", "sets": 3, "duration": "45s"},
+              {"name": "Dead Bug", "sets": 2, "reps": "10 each"},
+              {"name": "Bird Dog", "sets": 2, "reps": "8 each"}
+            ]
+          },
+          "coolDown": {"duration": "5 min", "exercises": ["Stretch", "Foam roll"]}
+        }
+      ],
+      "nutrition": {
+        "breakfast": {"time": "06:00 AM", "meal": "Banana, handful of almonds (pre-workout)"},
+        "postWorkoutAM": {"time": "08:30 AM", "meal": "Oats with milk, 3 eggs, fruit"},
+        "lunch": {"time": "12:30 PM", "meal": "Rice, chicken/paneer (150g), dal, vegetables"},
+        "preWorkoutPM": {"time": "04:00 PM", "meal": "Banana, peanut butter toast"},
+        "postWorkoutPM": {"time": "06:30 PM", "meal": "Whey protein (30g), banana"},
+        "dinner": {"time": "08:00 PM", "meal": "Roti (3), chicken/fish (150g), salad, vegetables"}
+      },
+      "recovery": ["Sleep target: 8+ hours", "Hydration: 3.5L minimum"]
+    },
+    "tuesday": {
+      "date": "2025-01-07",
+      "dayType": "MEDIUM CNS",
+      "sessions": [
+        {
+          "time": "06:30 AM",
+          "type": "Tempo Runs",
+          "duration": "60 min",
+          "warmUp": {
+            "duration": "15 min",
+            "exercises": ["Jog 600m", "Dynamic stretches", "Sprint drills (light) 2x20m each"]
+          },
+          "mainWorkout": {
+            "description": "Extensive Tempo - Aerobic Development",
+            "exercises": [
+              {"name": "100m tempo runs", "sets": 10, "intensity": "65-70%", "targetTime": "15.5-16.0s", "walkBack": "100m walk recovery"},
+              {"name": "200m tempo runs", "sets": 5, "intensity": "65-70%", "targetTime": "32-33s", "walkBack": "200m walk recovery"}
+            ],
+            "totalVolume": "2000m"
+          },
+          "coolDown": {"duration": "10 min", "exercises": ["Slow jog 400m", "Stretching routine"]}
+        },
+        {
+          "time": "05:00 PM",
+          "type": "Core & Mobility",
+          "duration": "45 min",
+          "workout": {
+            "mobilityCircuit": [
+              {"name": "Hip 90/90 stretch", "duration": "60s each"},
+              {"name": "World's greatest stretch", "reps": "8 each"},
+              {"name": "T-spine rotation", "reps": "10 each"},
+              {"name": "Ankle dorsiflexion stretch", "duration": "45s each"},
+              {"name": "Pigeon stretch", "duration": "60s each"}
+            ],
+            "coreCircuit": [
+              {"name": "Plank variations", "duration": "3 x 45s"},
+              {"name": "Side plank", "duration": "2 x 30s each"},
+              {"name": "Pallof press", "reps": "2 x 12 each"},
+              {"name": "Ab wheel rollout", "reps": "3 x 8"},
+              {"name": "Copenhagen adductors", "reps": "2 x 8 each"}
+            ],
+            "prehabWork": [
+              {"name": "Nordic curls", "sets": 3, "reps": 5, "notes": "Slow eccentric, assist on way up"},
+              {"name": "Single-leg glute bridge", "sets": 2, "reps": "10 each"}
+            ]
+          }
+        }
+      ],
+      "nutrition": {
+        "note": "Moderate carb day - reduce portion by 20%"
+      },
+      "recovery": ["Foam rolling 15 min", "Consider cold shower or contrast bath"]
+    },
+    "wednesday": {
+      "date": "2025-01-08",
+      "dayType": "MEDIUM CNS",
+      "sessions": [
+        {
+          "time": "06:30 AM",
+          "type": "Plyometrics",
+          "duration": "60 min",
+          "warmUp": {
+            "duration": "15 min",
+            "exercises": ["Jog 400m", "Dynamic mobility", "Activation drills", "Jump rope 2x30s"]
+          },
+          "mainWorkout": {
+            "exercises": [
+              {"name": "Box jumps (step down)", "sets": 3, "reps": 5, "height": "60cm", "rest": "90s", "contacts": 15},
+              {"name": "Broad jumps", "sets": 3, "reps": 4, "rest": "90s", "contacts": 12},
+              {"name": "Single-leg hops", "sets": 2, "reps": "5 each", "rest": "60s", "contacts": 20},
+              {"name": "Ankle pogos", "sets": 2, "reps": 15, "rest": "45s", "contacts": 30}
+            ],
+            "totalContacts": 77,
+            "notes": "Focus on quality landings, minimize ground contact time on reactive jumps"
+          },
+          "technicalDrills": [
+            {"name": "A-Skip for height", "volume": "3 x 30m"},
+            {"name": "Single-leg bounds", "volume": "2 x 5 each"}
+          ],
+          "coolDown": {"duration": "10 min", "exercises": ["Light jog", "Stretching"]}
+        },
+        {
+          "time": "05:00 PM",
+          "type": "Strength - Upper Body",
+          "duration": "60 min",
+          "warmUp": {
+            "duration": "10 min",
+            "exercises": ["Row 5 min", "Arm circles", "Band pull-aparts", "Push-ups 2x10"]
+          },
+          "mainWorkout": {
+            "exercises": [
+              {"name": "Bench Press", "sets": 4, "reps": 6, "load": "75% (71 kg)", "rest": "2.5 min"},
+              {"name": "Weighted Pull-ups", "sets": 4, "reps": 6, "load": "+10 kg", "rest": "2.5 min"},
+              {"name": "Dumbbell Shoulder Press", "sets": 3, "reps": 8, "load": "25 kg each", "rest": "90s"},
+              {"name": "Dumbbell Row", "sets": 3, "reps": "10 each", "load": "32 kg", "rest": "90s"},
+              {"name": "Face Pulls", "sets": 3, "reps": 15, "load": "Light band", "rest": "60s"},
+              {"name": "Tricep Dips", "sets": 3, "reps": 12, "load": "BW", "rest": "60s"}
+            ]
+          },
+          "coolDown": {"duration": "5 min", "exercises": ["Stretch shoulders, chest, lats"]}
+        }
+      ]
+    },
+    "thursday": {
+      "date": "2025-01-09",
+      "dayType": "REST / RECOVERY",
+      "sessions": [
+        {
+          "time": "Morning",
+          "type": "Active Recovery",
+          "duration": "30-45 min",
+          "activities": [
+            "Light walk or swim (20 min)",
+            "Full body stretching routine (15 min)",
+            "Foam rolling (10 min)",
+            "Optional: Massage or physiotherapy"
+          ]
+        },
+        {
+          "time": "Evening",
+          "type": "Mobility & Treatment",
+          "duration": "30 min",
+          "activities": [
+            "Hip mobility routine",
+            "Ankle mobility work",
+            "Breathing exercises",
+            "Visualization practice (10 min)"
+          ]
+        }
+      ],
+      "nutrition": {
+        "note": "Rest day nutrition - reduce carbs by 30%, maintain protein intake"
+      },
+      "recovery": ["Extra sleep if needed", "Epsom salt bath", "Hydration focus"]
+    },
+    "friday": {
+      "date": "2025-01-10",
+      "dayType": "HIGH CNS",
+      "sessions": [
+        {
+          "time": "06:30 AM",
+          "type": "Speed Development",
+          "duration": "90 min",
+          "warmUp": {
+            "duration": "25 min",
+            "exercises": ["Jog 400m", "Full dynamic warm-up", "Activation drills", "Sprint drills (full series)", "Build-ups 4x60m"]
+          },
+          "mainWorkout": {
+            "exercises": [
+              {"name": "Flying 20m", "sets": 3, "intensity": "90%", "rest": "4 min", "cues": ["Relaxed speed", "High hips"]},
+              {"name": "40m from 3-point start", "sets": 4, "intensity": "85%", "rest": "4 min", "cues": ["Smooth acceleration", "Patient rise"]},
+              {"name": "60m from standing", "sets": 2, "intensity": "85%", "rest": "5 min", "cues": ["Full acceleration pattern"]}
+            ],
+            "totalVolume": "300m quality"
+          },
+          "technicalFocus": "Acceleration mechanics, arm action",
+          "coolDown": {"duration": "15 min", "exercises": ["Slow jog", "Full stretching routine", "Foam rolling"]}
+        },
+        {
+          "time": "05:00 PM",
+          "type": "Power Development",
+          "duration": "60 min",
+          "warmUp": {
+            "duration": "10 min",
+            "exercises": ["Bike 5 min", "Hip mobility", "Power position drills"]
+          },
+          "mainWorkout": {
+            "exercises": [
+              {"name": "Power Clean", "sets": 4, "reps": 3, "load": "75% (75 kg)", "rest": "3 min", "notes": "Focus on explosive hip extension"},
+              {"name": "Trap Bar Jump Squats", "sets": 3, "reps": 5, "load": "40% squat (60 kg)", "rest": "2.5 min"},
+              {"name": "Medicine Ball Throws", "sets": 3, "reps": 8, "load": "5 kg", "rest": "90s", "type": "Overhead, chest pass"},
+              {"name": "Single-leg RDL", "sets": 3, "reps": "8 each", "load": "20 kg DBs", "rest": "90s"}
+            ]
+          },
+          "coolDown": {"duration": "5 min", "exercises": ["Light stretch"]}
+        }
+      ]
+    },
+    "saturday": {
+      "date": "2025-01-11",
+      "dayType": "LOW CNS",
+      "sessions": [
+        {
+          "time": "07:00 AM",
+          "type": "Extensive Tempo",
+          "duration": "60 min",
+          "warmUp": {
+            "duration": "10 min",
+            "exercises": ["Easy jog 600m", "Light dynamic stretches"]
+          },
+          "mainWorkout": {
+            "description": "Recovery-focused aerobic work",
+            "exercises": [
+              {"name": "Tempo 100m", "sets": 8, "intensity": "60-65%", "targetTime": "16.5-17.0s", "recovery": "Walk back"},
+              {"name": "Tempo 150m", "sets": 4, "intensity": "60-65%", "recovery": "Walk back"}
+            ],
+            "totalVolume": "1400m"
+          },
+          "coolDown": {"duration": "10 min", "exercises": ["Easy jog", "Full body stretch"]}
+        },
+        {
+          "time": "04:00 PM",
+          "type": "Core & Prehab",
+          "duration": "30 min",
+          "workout": {
+            "exercises": [
+              {"name": "Core circuit", "duration": "15 min", "exercises": ["Plank variations", "Dead bugs", "Pallof press"]},
+              {"name": "Prehab work", "duration": "15 min", "exercises": ["Nordic curls (light)", "Calf raises", "Ankle mobility"]}
+            ]
+          }
+        }
+      ],
+      "nutrition": {
+        "note": "Moderate intake day, focus on recovery foods"
+      }
+    },
+    "sunday": {
+      "date": "2025-01-12",
+      "dayType": "COMPLETE REST",
+      "sessions": [],
+      "activities": [
+        "Complete rest from training",
+        "Light walking allowed (30 min max)",
+        "Stretching if desired",
+        "Mental preparation for next week",
+        "Review training log, set intentions"
+      ],
+      "nutrition": {
+        "note": "Rest day nutrition, prepare meals for upcoming week"
+      },
+      "recovery": ["10+ hours sleep opportunity", "Mental relaxation", "Family time"]
+    }
+  },
+  "weekSummary": {
+    "totalSprintVolume": "490m",
+    "totalTempoVolume": "3400m",
+    "strengthSessions": 3,
+    "plyoContacts": 77,
+    "CNSLoadDistribution": {
+      "high": 2,
+      "medium": 2,
+      "low": 1,
+      "rest": 2
+    },
+    "keyFocusPoints": [
+      "Establish training rhythm",
+      "Build movement quality in sprints",
+      "Develop strength foundation",
+      "Monitor hamstring response to load"
+    ],
+    "weeklyAssessment": {
+      "tests": ["30m time (Friday)", "Bodyweight (daily AM)"],
+      "wellness": "Complete daily wellness check each morning"
+    }
+  }
+}

@@ -1,0 +1,503 @@
+{
+  "planMetadata": {
+    "athleteId": "rahul_sharma_001",
+    "athleteName": "Rahul Sharma",
+    "primaryEvent": "100m",
+    "targetCompetition": "National Inter-State Championship 2025",
+    "competitionDate": "2025-06-15",
+    "currentPB": "10.85s",
+    "targetPB": "10.45s",
+    "generatedAt": "2025-12-31T10:00:00Z",
+    "planVersion": "1.0"
+  },
+  "athleteAssessment": {
+    "strengths": [
+      {
+        "area": "Posterior Chain Strength",
+        "details": "Deadlift at 2.5x bodyweight indicates excellent hip extension power",
+        "impact": "Critical for drive phase"
+      },
+      {
+        "area": "Cardiovascular Efficiency",
+        "details": "Low resting HR (52 bpm) and good VO2 max",
+        "impact": "Excellent recovery between reps"
+      },
+      {
+        "area": "Acceleration Capability",
+        "details": "10m time of 1.78s shows solid block start",
+        "impact": "Good foundation for improvement"
+      }
+    ],
+    "weaknesses": [
+      {
+        "area": "Max Velocity",
+        "details": "Flying 20m time (1.95s) indicates max velocity deficit",
+        "targetImprovement": "1.85-1.88s",
+        "priority": "CRITICAL"
+      },
+      {
+        "area": "Reactive Strength",
+        "details": "Standing long jump (295 cm) and vertical jump (62 cm) below elite",
+        "targetImprovement": "VJ 68+ cm, SLJ 310+ cm",
+        "priority": "HIGH"
+      },
+      {
+        "area": "Rate of Force Development",
+        "details": "Power Clean ratio 1.39x BW is below optimal",
+        "targetImprovement": "110 kg (1.53x BW)",
+        "priority": "HIGH"
+      }
+    ],
+    "injuryRisks": [
+      {
+        "area": "Left Hamstring",
+        "riskLevel": "MODERATE",
+        "history": "Strain in 2023, fully recovered",
+        "mitigation": ["Nordic curls", "Eccentric work", "Load monitoring"]
+      },
+      {
+        "area": "Ankle Complex",
+        "riskLevel": "LOW",
+        "history": "Mild sprain 2022",
+        "mitigation": ["Plyometric progression", "Mobility work"]
+      }
+    ]
+  },
+  "performancePrediction": {
+    "current100m": "10.85s",
+    "predictions": {
+      "bestCase": {
+        "time": "10.45s",
+        "improvement": "0.40s",
+        "requirements": "All training adaptations achieved, perfect race execution"
+      },
+      "realistic": {
+        "time": "10.55s",
+        "improvement": "0.30s",
+        "requirements": "90% training compliance, good competition conditions"
+      },
+      "conservative": {
+        "time": "10.65s",
+        "improvement": "0.20s",
+        "requirements": "Standard progression, accounting for setbacks"
+      }
+    },
+    "phaseBreakdown": {
+      "reaction": {"current": "0.150s", "target": "0.140s", "improvement": "0.010s"},
+      "drive_0_30m": {"current": "3.92s", "target": "3.82s", "improvement": "0.10s"},
+      "maxVelocity_30_60m": {"current": "2.93s", "target": "2.83s", "improvement": "0.10s"},
+      "maintenance_60_100m": {"current": "3.85s", "target": "3.65s", "improvement": "0.20s"}
+    }
+  },
+  "periodization": {
+    "phases": [
+      {
+        "name": "General Preparation Phase (GPP)",
+        "nameMarathi": "जनरल प्रिपरेशन फेज",
+        "startDate": "2025-01-01",
+        "endDate": "2025-03-09",
+        "durationWeeks": 10,
+        "volume": "HIGH (80-90%)",
+        "intensity": "LOW-MODERATE (60-75%)",
+        "primaryGoals": [
+          "Build aerobic base and general work capacity",
+          "Develop maximal strength foundation (target: Squat 165 kg)",
+          "Address reactive strength deficit (target: VJ 68 cm)",
+          "Establish movement patterns and sprint mechanics",
+          "Rehabilitate and strengthen hamstring complex"
+        ],
+        "trainingFocus": {
+          "strength": 35,
+          "speedDevelopment": 20,
+          "plyometrics": 15,
+          "tempoAerobic": 20,
+          "technicalMobility": 10
+        },
+        "technicalFocus": {
+          "primary": "Drive phase mechanics (first 30m)",
+          "secondary": "Arm action and posture"
+        },
+        "expectedAdaptations": {
+          "squat1RM": {"from": "150 kg", "to": "165 kg"},
+          "verticalJump": {"from": "62 cm", "to": "68 cm"},
+          "bodyFat": {"from": "10.5%", "to": "9.5%"}
+        }
+      },
+      {
+        "name": "Specific Preparation Phase (SPP)",
+        "nameMarathi": "स्पेसिफिक प्रिपरेशन फेज",
+        "startDate": "2025-03-10",
+        "endDate": "2025-05-18",
+        "durationWeeks": 10,
+        "volume": "MODERATE-HIGH (70-80%)",
+        "intensity": "MODERATE-HIGH (75-90%)",
+        "primaryGoals": [
+          "Develop maximum velocity (target: Flying 20m < 1.88s)",
+          "Convert strength to power (Power Clean → 110 kg)",
+          "Improve ground contact efficiency",
+          "Race-specific speed endurance",
+          "Competition simulation runs"
+        ],
+        "trainingFocus": {
+          "maxVelocity": 30,
+          "speedEndurance": 20,
+          "strengthPower": 25,
+          "plyometrics": 15,
+          "technical": 10
+        },
+        "technicalFocus": {
+          "primary": "Max velocity mechanics (upright posture, frontside mechanics)",
+          "secondary": "Relaxation at high speed"
+        },
+        "expectedAdaptations": {
+          "60mTime": {"from": "6.85s", "to": "6.70s"},
+          "flying20m": {"from": "1.95s", "to": "1.88s"},
+          "powerClean": {"from": "100 kg", "to": "110 kg"}
+        }
+      },
+      {
+        "name": "Pre-Competition Phase",
+        "nameMarathi": "प्री-कॉम्पिटिशन फेज",
+        "startDate": "2025-05-19",
+        "endDate": "2025-06-01",
+        "durationWeeks": 2,
+        "volume": "MODERATE (60-70%)",
+        "intensity": "HIGH (90-98%)",
+        "primaryGoals": [
+          "Sharpen race-specific fitness",
+          "Perfect competition routines",
+          "Mental preparation and visualization",
+          "Fine-tune technical elements",
+          "Competition simulation (full 100m races)"
+        ],
+        "trainingFocus": {
+          "racePaceSprints": 40,
+          "maintenanceStrength": 20,
+          "technicalPolish": 25,
+          "mentalPreparation": 15
+        },
+        "technicalFocus": {
+          "primary": "Race execution (start to finish)",
+          "secondary": "Competition routine consistency"
+        }
+      },
+      {
+        "name": "Peak/Taper Phase",
+        "nameMarathi": "पीक परफॉर्मन्स / टेपर फेज",
+        "startDate": "2025-06-02",
+        "endDate": "2025-06-15",
+        "durationWeeks": 2,
+        "volume": "LOW (40-50%)",
+        "intensity": "RACE PACE (95-100%)",
+        "primaryGoals": [
+          "Achieve neural freshness",
+          "Maintain race sharpness with minimal fatigue",
+          "Perfect mental preparation",
+          "Execute competition week protocol"
+        ],
+        "taperProtocol": {
+          "volumeReduction": [
+            {"daysOut": 14, "sprintVolume": "70%", "strengthVolume": "70%"},
+            {"daysOut": 10, "sprintVolume": "50%", "strengthVolume": "50%"},
+            {"daysOut": 6, "sprintVolume": "35%", "strengthVolume": "30%"},
+            {"daysOut": 2, "sprintVolume": "15%", "strengthVolume": "0%"}
+          ]
+        }
+      },
+      {
+        "name": "Transition Phase",
+        "nameMarathi": "ट्रान्झिशन फेज",
+        "startDate": "2025-06-16",
+        "endDate": "2025-07-15",
+        "durationWeeks": 4,
+        "primaryGoals": [
+          "Physical and mental recovery",
+          "Address any minor injuries",
+          "Low-intensity cross-training",
+          "Gradual return to structured training"
+        ]
+      }
+    ]
+  },
+  "weeklyMicrocycle": {
+    "GPP": {
+      "monday": {
+        "am": {"type": "Acceleration", "intensity": "60-80%"},
+        "pm": {"type": "Lower Body Strength", "exercises": ["Squat", "RDL", "Hip Thrust"]}
+      },
+      "tuesday": {
+        "am": {"type": "Tempo Runs", "intensity": "65-70%", "volume": "2000-2500m"},
+        "pm": {"type": "Core & Mobility", "duration": "45 min"}
+      },
+      "wednesday": {
+        "am": {"type": "Plyometrics", "contacts": "60-80"},
+        "pm": {"type": "Upper Body Strength", "exercises": ["Bench", "Pull-ups", "Rows"]}
+      },
+      "thursday": {
+        "type": "REST / Active Recovery",
+        "activities": ["Mobility", "Treatment", "Pool"]
+      },
+      "friday": {
+        "am": {"type": "Speed Development", "intensity": "85-95%"},
+        "pm": {"type": "Lower Body Power", "exercises": ["Power Clean", "Box Jumps"]}
+      },
+      "saturday": {
+        "am": {"type": "Extensive Tempo", "volume": "1500-2000m"},
+        "pm": {"type": "Core & Prehab", "duration": "30 min"}
+      },
+      "sunday": {"type": "OFF"}
+    },
+    "SPP": {
+      "monday": {
+        "am": {"type": "Max Velocity", "intensity": "90-95%", "volume": "200-300m"},
+        "pm": {"type": "Power Lifts", "exercises": ["Power Clean", "Squat"]}
+      },
+      "tuesday": {
+        "am": {"type": "Speed Endurance", "reps": "3-4 x 150m"},
+        "pm": {"type": "Core & Stability", "duration": "40 min"}
+      },
+      "wednesday": {
+        "am": {"type": "Plyometrics High Intensity", "contacts": "80-120"},
+        "pm": {"type": "Upper Body", "exercises": ["Bench", "Rows", "Face Pulls"]}
+      },
+      "thursday": {
+        "type": "REST / Pool Recovery",
+        "activities": ["Hydrotherapy", "Massage", "Visualization"]
+      },
+      "friday": {
+        "am": {"type": "Acceleration + Max Velocity", "volume": "150-250m"},
+        "pm": {"type": "Lower Power", "exercises": ["Trap Bar Jumps", "Hip Thrust"]}
+      },
+      "saturday": {
+        "type": "Time Trial / Competition",
+        "notes": "B-level meets for race practice"
+      },
+      "sunday": {"type": "OFF"}
+    }
+  },
+  "sampleWorkouts": {
+    "speedDay": {
+      "phase": "SPP",
+      "dayOfWeek": "Monday",
+      "warmUp": {
+        "duration": "20 minutes",
+        "components": [
+          {"name": "Light jog", "duration": "400m"},
+          {"name": "Dynamic mobility", "exercises": ["Knee hugs", "Quad stretch", "RDL walk"]},
+          {"name": "Activation", "exercises": ["Glute bridges", "Clamshells", "Dead bugs"]},
+          {"name": "Sprint drills", "exercises": ["A-March", "A-Skip", "B-Skip", "Build-ups"]}
+        ]
+      },
+      "mainWorkout": {
+        "type": "Max Velocity",
+        "targetCalculation": {
+          "pb100m": "10.85s",
+          "maxVelocity": "9.22 m/s",
+          "flying30mTarget95": "3.42s"
+        },
+        "sets": [
+          {"exercise": "Flying 20m", "reps": 2, "intensity": "95%", "targetTime": "2.28s", "rest": "4 min"},
+          {"exercise": "Flying 30m", "reps": 2, "intensity": "95%", "targetTime": "3.42s", "rest": "5 min"},
+          {"exercise": "60m from 3-point", "reps": 2, "intensity": "95%", "targetTime": "6.95s", "rest": "6 min"}
+        ],
+        "totalVolume": "220m quality meters"
+      },
+      "strengthPM": {
+        "exercises": [
+          {"name": "Power Clean", "sets": 4, "reps": 3, "load": "85% (85 kg)", "rest": "3 min"},
+          {"name": "Back Squat", "sets": 4, "reps": 4, "load": "82% (135 kg)", "rest": "3 min"},
+          {"name": "Romanian Deadlift", "sets": 3, "reps": 6, "load": "70% (125 kg)", "rest": "2.5 min"},
+          {"name": "Hip Thrust", "sets": 3, "reps": 8, "load": "75% (150 kg)", "rest": "2 min"},
+          {"name": "Nordic Curls", "sets": 3, "reps": 5, "load": "BW", "rest": "2 min"}
+        ]
+      },
+      "coreWork": {
+        "exercises": [
+          {"name": "Plank", "sets": 3, "duration": "45s"},
+          {"name": "Side plank", "sets": 2, "duration": "30s each"},
+          {"name": "Copenhagen adductors", "sets": 2, "reps": 8, "each": true},
+          {"name": "Pallof press", "sets": 2, "reps": 10, "each": true}
+        ]
+      },
+      "coolDown": {
+        "duration": "10 minutes",
+        "components": ["Light jog 400m", "Static stretching", "Foam rolling"]
+      }
+    },
+    "strengthDay": {
+      "phase": "GPP",
+      "dayOfWeek": "Wednesday",
+      "warmUp": {
+        "duration": "15 minutes",
+        "components": ["Bike/row 5 min", "Hip mobility", "Activation drills", "Movement prep"]
+      },
+      "mainWorkout": {
+        "primaryLifts": [
+          {"name": "Back Squat", "sets": 5, "reps": 5, "load": "80% (120 kg)", "rest": "3-4 min"},
+          {"name": "Bench Press", "sets": 4, "reps": 6, "load": "78% (75 kg)", "rest": "2.5 min"},
+          {"name": "Weighted Pull-ups", "sets": 4, "reps": 6, "load": "+15 kg", "rest": "2.5 min"}
+        ],
+        "accessoryWork": [
+          {"name": "Bulgarian Split Squat", "sets": 3, "reps": 8, "load": "40 kg DBs"},
+          {"name": "Barbell Hip Thrust", "sets": 3, "reps": 10, "load": "140 kg"},
+          {"name": "Dumbbell Row", "sets": 3, "reps": 10, "load": "35 kg"},
+          {"name": "Face Pulls", "sets": 3, "reps": 15, "load": "Light band"}
+        ]
+      },
+      "plyometrics": {
+        "exercises": [
+          {"name": "Box Jumps (step down)", "sets": 3, "reps": 5},
+          {"name": "Broad Jumps", "sets": 3, "reps": 4},
+          {"name": "Lateral bounds", "sets": 2, "reps": 6, "each": true}
+        ],
+        "totalContacts": 39
+      }
+    },
+    "technicalDay": {
+      "phase": "Pre-Competition",
+      "dayOfWeek": "Friday",
+      "warmUp": {
+        "duration": "25 minutes",
+        "focus": "Movement quality and race preparation"
+      },
+      "blockWorkSession": {
+        "blockSettings": {
+          "frontBlock": "2 foot lengths from line",
+          "rearBlock": "3 foot lengths from line",
+          "blockAngle": {"front": "45°", "rear": "55°"}
+        },
+        "drills": [
+          {"name": "Block clearance (no run)", "reps": 6, "focus": "First step mechanics"},
+          {"name": "3-step drive", "reps": 4, "focus": "Drive angle"},
+          {"name": "5-step drive", "reps": 4, "focus": "Acceleration pattern"},
+          {"name": "Block start to 10m", "reps": 4, "focus": "Complete start"},
+          {"name": "Block start to 20m", "reps": 3, "focus": "Drive to transition"},
+          {"name": "Block start to 30m", "reps": 2, "focus": "Full acceleration"}
+        ],
+        "technicalCues": [
+          "Push, don't pull - drive against blocks",
+          "45-degree body angle - forward lean",
+          "Patience in the drive - don't rush upright",
+          "Opposite arm, opposite leg - coordination",
+          "Eyes down, then horizon - head position progression"
+        ]
+      },
+      "raceModeling": {
+        "fullSimulation": {"distance": "100m", "intensity": "90%", "focus": "Execution, not time"},
+        "visualization": {"duration": "5 min", "content": "Race-day routine"}
+      }
+    }
+  },
+  "nutrition": {
+    "dailyTargets": {
+      "trainingDay": {
+        "calories": 3200,
+        "protein": {"grams": 144, "perKg": 2.0},
+        "carbs": {"grams": 360, "perKg": 5.0},
+        "fat": {"grams": 72, "perKg": 1.0}
+      },
+      "restDay": {
+        "calories": 2600,
+        "protein": {"grams": 130, "perKg": 1.8},
+        "carbs": {"grams": 252, "perKg": 3.5},
+        "fat": {"grams": 86, "perKg": 1.2}
+      },
+      "competitionDay": {
+        "calories": 3000,
+        "protein": {"grams": 130, "perKg": 1.8},
+        "carbs": {"grams": 432, "perKg": 6.0},
+        "fat": {"grams": 58, "perKg": 0.8}
+      }
+    },
+    "mealTiming": {
+      "breakfast": "7:00 AM",
+      "snack1": "10:00 AM",
+      "lunch": "12:30 PM",
+      "preWorkout": "3:00 PM",
+      "training": "4:00 PM",
+      "postWorkout": "6:00 PM",
+      "dinner": "7:30 PM",
+      "beforeBed": "9:30 PM"
+    },
+    "hydration": {
+      "daily": "3-4 L",
+      "preTraining": "500ml 2 hours before",
+      "duringTraining": "200ml every 20 min",
+      "postTraining": "1.5x fluid lost"
+    },
+    "supplements": [
+      {"name": "Whey Protein", "dosage": "25-30g", "timing": "Post-workout"},
+      {"name": "Creatine Monohydrate", "dosage": "5g", "timing": "Daily"},
+      {"name": "Caffeine", "dosage": "3mg/kg", "timing": "Pre-competition only"},
+      {"name": "Vitamin D", "dosage": "2000 IU", "timing": "Daily"},
+      {"name": "Omega-3", "dosage": "2-3g", "timing": "With meals"},
+      {"name": "Magnesium", "dosage": "400mg", "timing": "Evening"}
+    ]
+  },
+  "monitoring": {
+    "dailyWellnessCheck": [
+      {"parameter": "Sleep Quality", "scale": "1-10", "flagThreshold": "<6"},
+      {"parameter": "Sleep Duration", "unit": "hours", "flagThreshold": "<7h"},
+      {"parameter": "Muscle Soreness", "scale": "1-10", "flagThreshold": ">7"},
+      {"parameter": "Fatigue Level", "scale": "1-10", "flagThreshold": ">7"},
+      {"parameter": "Stress Level", "scale": "1-10", "flagThreshold": ">7"},
+      {"parameter": "Motivation", "scale": "1-10", "flagThreshold": "<5"},
+      {"parameter": "Resting HR", "unit": "bpm", "flagThreshold": ">60"}
+    ],
+    "weeklyTests": [
+      {"test": "30m time", "targetTrend": "Improving or stable"},
+      {"test": "Vertical Jump", "targetTrend": "Within 5% of best"},
+      {"test": "Session RPE avg", "targetTrend": "Match planned load"}
+    ],
+    "autoRegulation": {
+      "readinessScores": [
+        {"range": "8-10", "label": "Excellent", "action": "Proceed as planned, consider adding"},
+        {"range": "6-7", "label": "Good", "action": "Proceed as planned"},
+        {"range": "4-5", "label": "Moderate", "action": "Reduce volume 20%, maintain intensity"},
+        {"range": "2-3", "label": "Poor", "action": "Switch to recovery session"},
+        {"range": "0-1", "label": "Very Poor", "action": "Complete rest, investigate cause"}
+      ]
+    }
+  },
+  "mentalPreparation": {
+    "preRaceRoutine": {
+      "nightBefore": ["Early dinner", "Visualization", "8+ hours sleep"],
+      "morningOf": ["Light breakfast", "Arrive 3 hours early", "Familiar routine"]
+    },
+    "cueWords": {
+      "preRace": "Ready",
+      "inBlocks": "Loaded",
+      "gun": "Explode",
+      "drive": "Push",
+      "transition": "Tall",
+      "maxVelocity": "Float",
+      "finish": "Drive through"
+    },
+    "visualizationProtocol": {
+      "duration": "10 minutes daily",
+      "content": ["Walking to blocks", "Track surface feel", "Perfect start", "Full race execution"]
+    }
+  },
+  "injuryManagement": {
+    "painScaleActions": [
+      {"level": "0", "action": "Proceed normally"},
+      {"level": "1-2", "action": "Proceed with monitoring"},
+      {"level": "3-4", "action": "Modify activity, reduce load"},
+      {"level": "5-6", "action": "Stop sprint work, alternative training"},
+      {"level": "7-8", "action": "Stop training, seek treatment"},
+      {"level": "9-10", "action": "Immediate medical attention"}
+    ],
+    "prehabProtocol": {
+      "hamstring": [
+        {"exercise": "Nordic curls", "frequency": "2-3x/week", "sets": 3, "reps": 5},
+        {"exercise": "Single-leg RDL", "frequency": "2-3x/week", "sets": 3, "reps": 8},
+        {"exercise": "Eccentric slides", "frequency": "Daily", "sets": 2, "reps": 10}
+      ],
+      "ankle": [
+        {"exercise": "Ankle circles", "sets": 2, "reps": 15},
+        {"exercise": "Calf raises", "sets": 3, "reps": 15},
+        {"exercise": "Single-leg pogos", "sets": 3, "reps": 20}
+      ]
+    }
+  }
+}

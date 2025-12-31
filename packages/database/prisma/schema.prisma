@@ -1,0 +1,2428 @@
+// ============================================
+// PRISMA SCHEMA - ATHLETE PERFORMANCE SYSTEM
+// Database: PostgreSQL (Neon)
+// Total Tables: 72 | Components: 221
+// ============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// PART 1: ENUMS
+// ============================================
+
+enum UserRole {
+  ADMIN
+  COACH
+  ATHLETE
+  MEDICAL
+  NUTRITIONIST
+  PHYSIOTHERAPIST
+  PARENT
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AthleteCategory {
+  SUB_JUNIOR
+  JUNIOR
+  YOUTH
+  SENIOR
+  MASTERS
+}
+
+enum DominantSide {
+  LEFT
+  RIGHT
+  AMBIDEXTROUS
+}
+
+enum EventCategory {
+  SPRINT
+  HURDLES
+  MIDDLE_DISTANCE
+  LONG_DISTANCE
+  JUMPS
+  THROWS
+  COMBINED
+  RACE_WALK
+  RELAY
+}
+
+enum EventType {
+  // Sprints
+  M_60
+  M_100
+  M_200
+  M_400
+  // Hurdles
+  M_60H
+  M_100H
+  M_110H
+  M_400H
+  // Middle Distance
+  M_800
+  M_1500
+  M_MILE
+  // Long Distance
+  M_3000
+  M_5000
+  M_10000
+  HALF_MARATHON
+  MARATHON
+  M_3000SC
+  // Jumps
+  LONG_JUMP
+  TRIPLE_JUMP
+  HIGH_JUMP
+  POLE_VAULT
+  // Throws
+  SHOT_PUT
+  DISCUS
+  JAVELIN
+  HAMMER
+  // Combined
+  DECATHLON
+  HEPTATHLON
+  PENTATHLON
+  // Race Walk
+  WALK_20K
+  WALK_50K
+  // Relays
+  RELAY_4X100
+  RELAY_4X400
+}
+
+enum TestType {
+  // Speed Tests
+  SPRINT_10M
+  SPRINT_20M
+  SPRINT_30M
+  SPRINT_40M
+  SPRINT_60M
+  FLYING_10M
+  FLYING_20M
+  FLYING_30M
+  // Strength Tests
+  BACK_SQUAT_1RM
+  FRONT_SQUAT_1RM
+  DEADLIFT_1RM
+  BENCH_PRESS_1RM
+  POWER_CLEAN_1RM
+  HANG_CLEAN_1RM
+  SNATCH_1RM
+  // Power Tests
+  CMJ
+  SJ
+  DROP_JUMP
+  BROAD_JUMP
+  SINGLE_LEG_HOP
+  TRIPLE_HOP
+  MED_BALL_THROW
+  // Endurance Tests
+  VO2MAX
+  LACTATE_THRESHOLD
+  CRITICAL_SPEED
+  BEEP_TEST
+  COOPER_TEST
+  TIME_TRIAL
+  // Agility Tests
+  T_TEST
+  ILLINOIS_TEST
+  PRO_AGILITY
+  AGILITY_505
+  // Flexibility Tests
+  SIT_AND_REACH
+  THOMAS_TEST
+  ANKLE_DORSIFLEXION
+  HIP_ROTATION
+  SHOULDER_MOBILITY
+  // Reaction Tests
+  REACTION_TIME
+  // Core Tests
+  PLANK_HOLD
+  SIDE_PLANK
+  SORENSEN_TEST
+}
+
+enum InjuryType {
+  ACUTE
+  CHRONIC
+  OVERUSE
+  TRAUMATIC
+  RECURRENT
+}
+
+enum InjurySeverity {
+  MINOR
+  MILD
+  MODERATE
+  SEVERE
+  MAJOR
+}
+
+enum BodyPart {
+  HEAD
+  NECK
+  SHOULDER_LEFT
+  SHOULDER_RIGHT
+  UPPER_ARM_LEFT
+  UPPER_ARM_RIGHT
+  ELBOW_LEFT
+  ELBOW_RIGHT
+  FOREARM_LEFT
+  FOREARM_RIGHT
+  WRIST_LEFT
+  WRIST_RIGHT
+  HAND_LEFT
+  HAND_RIGHT
+  UPPER_BACK
+  LOWER_BACK
+  CHEST
+  ABDOMEN
+  HIP_LEFT
+  HIP_RIGHT
+  GROIN_LEFT
+  GROIN_RIGHT
+  GLUTE_LEFT
+  GLUTE_RIGHT
+  HAMSTRING_LEFT
+  HAMSTRING_RIGHT
+  QUADRICEP_LEFT
+  QUADRICEP_RIGHT
+  ADDUCTOR_LEFT
+  ADDUCTOR_RIGHT
+  KNEE_LEFT
+  KNEE_RIGHT
+  CALF_LEFT
+  CALF_RIGHT
+  SHIN_LEFT
+  SHIN_RIGHT
+  ACHILLES_LEFT
+  ACHILLES_RIGHT
+  ANKLE_LEFT
+  ANKLE_RIGHT
+  FOOT_LEFT
+  FOOT_RIGHT
+}
+
+enum PeriodizationType {
+  LINEAR
+  BLOCK
+  UNDULATING
+  CONJUGATE
+  DOUBLE_PEAK
+  TRIPLE_PEAK
+}
+
+enum TrainingPhase {
+  GENERAL_PREPARATION
+  SPECIFIC_PREPARATION
+  PRE_COMPETITION
+  COMPETITION
+  PEAK_TAPER
+  TRANSITION
+  ACTIVE_RECOVERY
+}
+
+enum WorkoutType {
+  SPEED
+  SPEED_ENDURANCE
+  ACCELERATION
+  MAX_VELOCITY
+  TEMPO
+  ENDURANCE
+  STRENGTH
+  POWER
+  PLYOMETRIC
+  TECHNICAL
+  RECOVERY
+  COMPETITION
+  TESTING
+  WARM_UP_ONLY
+  REST
+}
+
+enum CompetitionPriority {
+  A_PRIORITY
+  B_PRIORITY
+  C_PRIORITY
+}
+
+// ============================================
+// PART 2: USER & AUTHENTICATION
+// ============================================
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  passwordHash      String
+  role              UserRole
+  firstName         String
+  lastName          String
+  phone             String?
+  profileImage      String?
+  isActive          Boolean   @default(true)
+  emailVerified     Boolean   @default(false)
+  lastLogin         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  athlete           Athlete?
+  coach             Coach?
+  medicalStaff      MedicalStaff?
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  sentMessages      Message[]       @relation("SentMessages")
+  receivedMessages  Message[]       @relation("ReceivedMessages")
+
+  @@index([email])
+  @@index([role])
+}
+
+model Coach {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id])
+  specialization    String?
+  certification     String?
+  experience        Int?
+
+  athletes          Athlete[]
+  trainingGroups    TrainingGroup[]
+  createdWorkouts   Workout[]
+  createdPlans      MacroCycle[]
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model MedicalStaff {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id])
+  specialization    String?
+  licenseNumber     String?
+
+  medicalNotes      MedicalNote[]
+  injuryRecords     InjuryRecord[]
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// ============================================
+// PART 3: ATHLETE PROFILE
+// ============================================
+
+model Athlete {
+  id                  String          @id @default(cuid())
+  odooAthleteId       Int?            @unique
+  userId              String          @unique
+  user                User            @relation(fields: [userId], references: [id])
+
+  dateOfBirth         DateTime
+  gender              Gender
+  nationality         String?
+
+  height              Float?
+  weight              Float?
+  bodyFatPercentage   Float?
+  armSpan             Float?
+  legLength           Float?
+
+  category            AthleteCategory
+  dominantLeg         DominantSide?
+  dominantHand        DominantSide?
+  trainingAge         Int
+
+  coachId             String?
+  coach               Coach?          @relation(fields: [coachId], references: [id])
+  trainingGroupId     String?
+  trainingGroup       TrainingGroup?  @relation(fields: [trainingGroupId], references: [id])
+
+  isActive            Boolean         @default(true)
+  medicalClearance    Boolean         @default(true)
+  antiDopingStatus    String?         @default("CLEAR")
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  events              AthleteEvent[]
+  personalBests       PersonalBest[]
+  performanceTests    PerformanceTest[]
+  bloodTests          BloodTest[]
+  bodyCompositions    BodyComposition[]
+  movementScreens     MovementScreen[]
+  macroCycles         MacroCycle[]
+  workouts            Workout[]
+  workoutLogs         WorkoutLog[]
+  wellnessLogs        WellnessLog[]
+  loadRecords         LoadRecord[]
+  readinessScores     ReadinessScore[]
+  injuryHistory       InjuryRecord[]
+  medicalNotes        MedicalNote[]
+  medications         Medication[]
+  supplements         Supplement[]
+  menstrualLogs       MenstrualLog[]
+  competitions        AthleteCompetition[]
+  competitionResults  CompetitionResult[]
+  biomechAnalyses     BiomechAnalysis[]
+  videoAnalyses       VideoAnalysis[]
+  pbPredictions       PBPrediction[]
+  strengthWeakness    StrengthWeaknessAnalysis[]
+  nutritionPlans      NutritionPlan[]
+  mealLogs            MealLog[]
+  mentalSkills        MentalSkillAssessment[]
+  goalSettings        GoalSetting[]
+  recoveryLogs        RecoveryLog[]
+  documents           AthleteDocument[]
+  progressPhotos      ProgressPhoto[]
+  attendanceRecords   AttendanceRecord[]
+
+  @@index([coachId])
+  @@index([category])
+  @@index([isActive])
+}
+
+model TrainingGroup {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  coachId     String
+  coach       Coach     @relation(fields: [coachId], references: [id])
+
+  athletes    Athlete[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model AthleteEvent {
+  id            String        @id @default(cuid())
+  athleteId     String
+  athlete       Athlete       @relation(fields: [athleteId], references: [id])
+  eventType     EventType
+  eventCategory EventCategory
+  isPrimary     Boolean       @default(false)
+
+  createdAt     DateTime      @default(now())
+
+  @@unique([athleteId, eventType])
+  @@index([athleteId])
+}
+
+model PersonalBest {
+  id            String    @id @default(cuid())
+  athleteId     String
+  athlete       Athlete   @relation(fields: [athleteId], references: [id])
+  eventType     EventType
+
+  performance   Float
+  wind          Float?
+  altitude      Int?
+  isIndoor      Boolean   @default(false)
+
+  competition   String?
+  location      String?
+  date          DateTime
+
+  isVerified    Boolean   @default(false)
+  videoUrl      String?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([athleteId, eventType])
+}
+
+// ============================================
+// PART 4: ELITE BENCHMARKS
+// ============================================
+
+model EliteBenchmark {
+  id              String        @id @default(cuid())
+  eventType       EventType
+  gender          Gender
+  category        AthleteCategory
+
+  worldRecord     Float
+  olympicStandard Float
+  worldClassMin   Float
+  nationalElite   Float
+  collegeElite    Float
+  clubLevel       Float
+
+  benchmarks      Json
+
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([eventType, gender, category])
+}
+
+// ============================================
+// PART 5: PERFORMANCE TESTING
+// ============================================
+
+model PerformanceTest {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+  testType        TestType
+  testDate        DateTime
+
+  value           Float
+  unit            String
+  secondaryValue  Float?
+
+  conditions      String?
+  equipment       String?
+  notes           String?
+
+  percentile      Float?
+  rating          String?
+
+  videoUrl        String?
+  rawDataUrl      String?
+  testedBy        String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId, testType])
+  @@index([testDate])
+}
+
+model BodyComposition {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+  testDate        DateTime
+
+  weight          Float
+  bodyFat         Float?
+  muscleMass      Float?
+  boneMass        Float?
+  waterPercentage Float?
+  visceralFat     Float?
+  bmr             Float?
+
+  method          String
+  skinfoldData    Json?
+  girthData       Json?
+
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model MovementScreen {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+  testDate        DateTime
+
+  deepSquat           Int?
+  hurdleStep          Int?
+  inlineLunge         Int?
+  shoulderMobility    Int?
+  activeStraightLeg   Int?
+  trunkStability      Int?
+  rotaryStability     Int?
+  totalScore          Int?
+
+  asymmetries     Json?
+  posturalNotes   String?
+  recommendations String?
+  testedBy        String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+// ============================================
+// PART 6: BLOOD & MEDICAL
+// ============================================
+
+model BloodTest {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+  testDate        DateTime
+  labName         String?
+
+  // Complete Blood Count
+  hemoglobin      Float?
+  hematocrit      Float?
+  rbc             Float?
+  wbc             Float?
+  platelets       Float?
+  mcv             Float?
+  mch             Float?
+  mchc            Float?
+
+  // Iron Panel
+  ferritin        Float?
+  serumIron       Float?
+  tibc            Float?
+  transferrin     Float?
+  transferrinSat  Float?
+
+  // Muscle & Recovery Markers
+  creatineKinase  Float?
+  ldh             Float?
+  myoglobin       Float?
+
+  // Hormones
+  cortisol        Float?
+  testosterone    Float?
+  tCRatio         Float?
+
+  // Thyroid
+  tsh             Float?
+  t3              Float?
+  t4              Float?
+  freeT3          Float?
+  freeT4          Float?
+
+  // Vitamins & Minerals
+  vitaminD        Float?
+  vitaminB12      Float?
+  folate          Float?
+  magnesium       Float?
+  zinc            Float?
+  calcium         Float?
+
+  // Metabolic
+  glucose         Float?
+  hba1c           Float?
+  cholesterol     Float?
+  hdl             Float?
+  ldl             Float?
+  triglycerides   Float?
+
+  // Kidney & Liver
+  creatinine      Float?
+  bun             Float?
+  ast             Float?
+  alt             Float?
+
+  // Inflammation
+  crp             Float?
+  esr             Float?
+
+  // Urine
+  urineSpecificGravity Float?
+  urineProtein    String?
+  urineGlucose    String?
+
+  // AI Analysis Results
+  analysisResult  Json?
+  overallStatus   String?
+
+  reportUrl       String?
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+  @@index([testDate])
+}
+
+model MedicalNote {
+  id              String        @id @default(cuid())
+  athleteId       String
+  athlete         Athlete       @relation(fields: [athleteId], references: [id])
+  staffId         String
+  staff           MedicalStaff  @relation(fields: [staffId], references: [id])
+
+  noteDate        DateTime
+  type            String
+  content         String
+  diagnosis       String?
+  recommendations String?
+  followUpDate    DateTime?
+
+  attachments     Json?
+
+  createdAt       DateTime      @default(now())
+
+  @@index([athleteId])
+}
+
+model Medication {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+
+  name            String
+  dosage          String
+  frequency       String
+  reason          String?
+  prescribedBy    String?
+  startDate       DateTime
+  endDate         DateTime?
+  isActive        Boolean   @default(true)
+
+  isTUE           Boolean   @default(false)
+  tueDocument     String?
+  wadaStatus      String?
+
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model Supplement {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+
+  name            String
+  brand           String?
+  dosage          String
+  timing          String
+  reason          String?
+  startDate       DateTime
+  endDate         DateTime?
+  isActive        Boolean   @default(true)
+
+  isCertified     Boolean?
+  certificationBody String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model MenstrualLog {
+  id              String    @id @default(cuid())
+  athleteId       String
+  athlete         Athlete   @relation(fields: [athleteId], references: [id])
+
+  cycleStartDate  DateTime
+  cycleEndDate    DateTime?
+  cycleLength     Int?
+  periodLength    Int?
+
+  flowIntensity   Int?
+  cramps          Int?
+  fatigue         Int?
+  mood            Int?
+
+  currentPhase    String?
+
+  notes           String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model CardiacScreening {
+  id              String    @id @default(cuid())
+  athleteId       String
+  screeningDate   DateTime
+
+  ecgResult       String?
+  ecgFindings     String?
+  ecgFileUrl      String?
+
+  echoResult      String?
+  echoFindings    String?
+
+  stressTestResult String?
+  maxHR           Int?
+
+  clearedForSport Boolean   @default(true)
+  reviewedBy      String?
+  recommendations String?
+
+  createdAt       DateTime  @default(now())
+}
+
+// ============================================
+// PART 7: INJURY & REHABILITATION
+// ============================================
+
+model InjuryRecord {
+  id                  String          @id @default(cuid())
+  athleteId           String
+  athlete             Athlete         @relation(fields: [athleteId], references: [id])
+
+  injuryDate          DateTime
+  bodyPart            BodyPart
+  injuryType          InjuryType
+  severity            InjurySeverity
+  diagnosis           String
+  mechanism           String?
+
+  initialTreatment    String?
+  ongoingTreatment    String?
+  surgery             Boolean         @default(false)
+  surgeryDate         DateTime?
+  surgeryDetails      String?
+
+  estimatedRecovery   Int?
+  actualRecovery      Int?
+  returnToTrainDate   DateTime?
+  returnToCompDate    DateTime?
+
+  status              String          @default("ACTIVE")
+  isRecurrent         Boolean         @default(false)
+  previousInjuryId    String?
+
+  diagnosedById       String?
+  diagnosedBy         MedicalStaff?   @relation(fields: [diagnosedById], references: [id])
+
+  imagingUrls         Json?
+  notes               String?
+
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+
+  rehabSessions       RehabSession[]
+  returnToPlayChecks  ReturnToPlayCheck[]
+
+  @@index([athleteId])
+  @@index([status])
+}
+
+model RehabSession {
+  id              String        @id @default(cuid())
+  injuryId        String
+  injury          InjuryRecord  @relation(fields: [injuryId], references: [id])
+
+  sessionDate     DateTime
+  sessionNumber   Int
+
+  exercises       Json
+  modalities      Json?
+  manualTherapy   String?
+
+  painBefore      Int?
+  painAfter       Int?
+  rom             String?
+  strength        String?
+
+  progressNotes   String?
+  nextSteps       String?
+  therapist       String?
+
+  createdAt       DateTime      @default(now())
+
+  @@index([injuryId])
+}
+
+model ReturnToPlayCheck {
+  id              String        @id @default(cuid())
+  injuryId        String
+  injury          InjuryRecord  @relation(fields: [injuryId], references: [id])
+
+  checkDate       DateTime
+  phase           String
+
+  painFree        Boolean
+  fullROM         Boolean
+  strengthSymmetry Float?
+  functionalTests Json?
+  sportSpecificTests Json?
+
+  passed          Boolean
+  clearedFor      String?
+  restrictions    String?
+  clearedBy       String?
+
+  createdAt       DateTime      @default(now())
+
+  @@index([injuryId])
+}
+
+model InjuryRiskAssessment {
+  id              String    @id @default(cuid())
+  athleteId       String
+  assessmentDate  DateTime
+
+  hamstringRisk   Int?
+  quadRisk        Int?
+  calfRisk        Int?
+  ankleRisk       Int?
+  kneeRisk        Int?
+  hipFlexorRisk   Int?
+  groinRisk       Int?
+  lowerBackRisk   Int?
+  shoulderRisk    Int?
+
+  overallRisk     Int
+  riskLevel       String
+
+  riskFactors     Json
+  recommendations Json
+  modelVersion    String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+// ============================================
+// PART 8: BIOMECHANICS & VIDEO
+// ============================================
+
+model BiomechAnalysis {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+  analysisDate      DateTime
+  eventType         EventType
+
+  contactTimeLeft   Float?
+  contactTimeRight  Float?
+  flightTime        Float?
+  stepLength        Float?
+  stepFrequency     Float?
+  verticalOscillation Float?
+
+  contactAsymmetry  Float?
+  forceAsymmetry    Float?
+
+  hipAngleTouchdown     Float?
+  kneeAngleTouchdown    Float?
+  ankleAngleTouchdown   Float?
+  trunkLean             Float?
+
+  overstrideDistance    Float?
+  overstrideAngle       Float?
+
+  blockClearanceTime    Float?
+  firstStepLength       Float?
+  pushOffAngle          Float?
+
+  takeoffDistance       Float?
+  landingDistance       Float?
+  hurdleFlightTime      Float?
+  leadLegAngle          Float?
+  trailLegAngle         Float?
+
+  approachVelocity      Float?
+  takeoffAngle          Float?
+  takeoffVelocity       Float?
+  penultimateStepLength Float?
+
+  releaseAngle          Float?
+  releaseVelocity       Float?
+  releaseHeight         Float?
+
+  findings              Json?
+  recommendations       Json?
+  forceData             Json?
+  testedBy              String?
+
+  createdAt             DateTime @default(now())
+
+  @@index([athleteId])
+}
+
+model VideoAnalysis {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+
+  uploadDate        DateTime  @default(now())
+  analysisDate      DateTime?
+
+  videoUrl          String
+  thumbnailUrl      String?
+  duration          Float?
+  fps               Int?
+  resolution        String?
+
+  eventType         EventType?
+  activityType      String
+  viewAngle         String?
+
+  status            String    @default("UPLOADED")
+  processedVideoUrl String?
+  poseData          Json?
+  keyFrames         Json?
+  metrics           Json?
+  comparison        Json?
+
+  coachNotes        String?
+  athleteNotes      String?
+  tags              String[]
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+  @@index([status])
+}
+
+model WearableData {
+  id              String    @id @default(cuid())
+  athleteId       String
+  sessionDate     DateTime
+  deviceType      String
+  deviceId        String?
+
+  totalDistance   Float?
+  maxSpeed        Float?
+  avgSpeed        Float?
+  sprintCount     Int?
+  sprintDistance  Float?
+
+  playerLoad      Float?
+  accelerations   Int?
+  decelerations   Int?
+  impacts         Int?
+
+  avgHR           Int?
+  maxHR           Int?
+  hrZones         Json?
+
+  rawDataUrl      String?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+// ============================================
+// PART 9: LOAD & FATIGUE MONITORING
+// ============================================
+
+model LoadRecord {
+  id                  String    @id @default(cuid())
+  athleteId           String
+  athlete             Athlete   @relation(fields: [athleteId], references: [id])
+  recordDate          DateTime
+
+  sessionRPE          Int?
+  sessionDuration     Int?
+  sessionLoad         Float?
+
+  sprintLoad          Float?
+  strengthLoad        Float?
+  enduranceLoad       Float?
+  technicalLoad       Float?
+  plyoLoad            Float?
+
+  dailyLoad           Float
+
+  acuteLoad           Float?
+  chronicLoad         Float?
+  acwr                Float?
+  ewmaAcute           Float?
+  ewmaChronic         Float?
+  ewmaACWR            Float?
+
+  weeklyMean          Float?
+  weeklySD            Float?
+  monotony            Float?
+  strain              Float?
+
+  weeklyLoadChange    Float?
+  loadSpike           Boolean   @default(false)
+
+  trimp               Float?
+
+  isHighRisk          Boolean   @default(false)
+  riskReason          String?
+
+  createdAt           DateTime  @default(now())
+
+  @@unique([athleteId, recordDate])
+  @@index([athleteId])
+  @@index([recordDate])
+}
+
+model WellnessLog {
+  id                  String    @id @default(cuid())
+  athleteId           String
+  athlete             Athlete   @relation(fields: [athleteId], references: [id])
+  logDate             DateTime
+  logTime             DateTime?
+
+  sleepDuration       Float?
+  sleepQuality        Int?
+  sleepTime           DateTime?
+  wakeTime            DateTime?
+  sleepInterruptions  Int?
+
+  muscleSoreness      Int?
+  fatigue             Int?
+  energy              Int?
+
+  mood                Int?
+  stress              Int?
+  motivation          Int?
+  confidence          Int?
+
+  perceivedRecovery   Int?
+
+  restingHR           Int?
+  hrv                 Float?
+  bodyWeight          Float?
+  bodyTemperature     Float?
+
+  hydrationStatus     Int?
+  appetite            Int?
+
+  painPresent         Boolean   @default(false)
+  painLocation        String?
+  painLevel           Int?
+
+  travelFatigue       Boolean   @default(false)
+  academicStress      Boolean   @default(false)
+  personalStress      Boolean   @default(false)
+
+  notes               String?
+
+  createdAt           DateTime  @default(now())
+
+  @@unique([athleteId, logDate])
+  @@index([athleteId])
+}
+
+model ReadinessScore {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+  scoreDate         DateTime
+
+  sleepScore        Float?
+  recoveryScore     Float?
+  stressScore       Float?
+  fatigueScore      Float?
+  loadScore         Float?
+  hrvScore          Float?
+
+  overallReadiness  Float
+  readinessLevel    String
+
+  neuralFatigue     Float?
+  metabolicFatigue  Float?
+  mechanicalFatigue Float?
+  primaryFatigueType String?
+
+  recommendedIntensity  String?
+  recommendedFocus      String?
+  warnings              Json?
+
+  calculatedAt      DateTime  @default(now())
+  modelVersion      String?
+  inputData         Json?
+
+  createdAt         DateTime  @default(now())
+
+  @@unique([athleteId, scoreDate])
+  @@index([athleteId])
+}
+
+model FatigueAlert {
+  id              String    @id @default(cuid())
+  athleteId       String
+  alertDate       DateTime
+
+  alertType       String
+  severity        String
+  message         String
+
+  currentValue    Float?
+  threshold       Float?
+  trend           String?
+
+  recommendedAction String?
+  acknowledged    Boolean   @default(false)
+  acknowledgedBy  String?
+  acknowledgedAt  DateTime?
+
+  createdAt       DateTime  @default(now())
+
+  @@index([athleteId])
+  @@index([alertDate])
+}
+
+// ============================================
+// PART 10: PERIODIZATION
+// ============================================
+
+model MacroCycle {
+  id                  String            @id @default(cuid())
+  athleteId           String
+  athlete             Athlete           @relation(fields: [athleteId], references: [id])
+  coachId             String?
+  coach               Coach?            @relation(fields: [coachId], references: [id])
+
+  name                String
+  seasonYear          String
+  periodizationType   PeriodizationType
+
+  startDate           DateTime
+  endDate             DateTime
+  totalWeeks          Int
+
+  primaryGoal         String
+  secondaryGoals      Json?
+  targetPB            Json?
+
+  peakCount           Int               @default(1)
+  peakDates           Json?
+
+  status              String            @default("PLANNED")
+
+  seasonReview        String?
+  lessonsLearned      String?
+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  mesoCycles          MesoCycle[]
+
+  @@index([athleteId])
+}
+
+model MesoCycle {
+  id                  String        @id @default(cuid())
+  macroCycleId        String
+  macroCycle          MacroCycle    @relation(fields: [macroCycleId], references: [id])
+
+  phase               TrainingPhase
+  phaseNumber         Int
+  name                String?
+
+  startDate           DateTime
+  endDate             DateTime
+  totalWeeks          Int
+
+  primaryGoal         String
+  secondaryGoal       String?
+  technicalFocus      String?
+  technicalSecondary  String?
+
+  strengthEmphasis    Int?
+  speedEmphasis       Int?
+  enduranceEmphasis   Int?
+  powerEmphasis       Int?
+  technicalEmphasis   Int?
+
+  avgWeeklyLoad       Float?
+  peakWeeklyLoad      Float?
+  deloadWeek          Int?
+
+  expectedAdaptations Json?
+
+  testingWeek         Int?
+  testsPlanned        Json?
+
+  status              String        @default("PLANNED")
+
+  actualOutcome       String?
+  notes               String?
+
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  microCycles         MicroCycle[]
+
+  @@index([macroCycleId])
+}
+
+model MicroCycle {
+  id                  String      @id @default(cuid())
+  mesoCycleId         String
+  mesoCycle           MesoCycle   @relation(fields: [mesoCycleId], references: [id])
+
+  weekNumber          Int
+  absoluteWeekNumber  Int?
+  name                String?
+
+  startDate           DateTime
+  endDate             DateTime
+
+  weekType            String
+
+  weeklyObjective     String
+  keySession          String?
+
+  plannedLoad         Float?
+  intensityDistribution Json?
+
+  sprintVolume        Float?
+  tempoVolume         Float?
+  strengthSets        Int?
+  plyoContacts        Int?
+
+  dayStructure        Json?
+
+  status              String      @default("PLANNED")
+
+  actualLoad          Float?
+  complianceRate      Float?
+
+  weekReview          String?
+
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  workouts            Workout[]
+
+  @@index([mesoCycleId])
+}
+
+// ============================================
+// PART 11: WORKOUTS & SESSIONS
+// ============================================
+
+model Workout {
+  id                  String        @id @default(cuid())
+  athleteId           String
+  athlete             Athlete       @relation(fields: [athleteId], references: [id])
+  microCycleId        String?
+  microCycle          MicroCycle?   @relation(fields: [microCycleId], references: [id])
+  coachId             String?
+  coach               Coach?        @relation(fields: [coachId], references: [id])
+
+  workoutDate         DateTime
+  dayOfWeek           String
+  sessionNumber       Int           @default(1)
+
+  workoutType         WorkoutType
+  primaryFocus        String
+  secondaryFocus      String?
+
+  plannedRPE          Int?
+  plannedDuration     Int?
+  plannedLoad         Float?
+
+  location            String?
+  trackType           String?
+  weather             Json?
+
+  status              String        @default("PLANNED")
+
+  wasAutoAdjusted     Boolean       @default(false)
+  originalPlan        Json?
+  adjustmentReason    String?
+
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  warmUp              WarmUp?
+  trackSession        TrackSession?
+  strengthSession     StrengthSession?
+  plyoSession         PlyoSession?
+  coreSession         CoreSession?
+  coolDown            CoolDown?
+  workoutLog          WorkoutLog?
+
+  @@index([athleteId])
+  @@index([workoutDate])
+}
+
+model WarmUp {
+  id                String    @id @default(cuid())
+  workoutId         String    @unique
+  workout           Workout   @relation(fields: [workoutId], references: [id])
+
+  generalDuration   Int?
+  generalExercises  Json?
+  mobilityExercises Json?
+  activationDrills  Json?
+  runningDrills     Json?
+  buildUps          Json?
+  eventSpecificDrills Json?
+
+  totalDuration     Int?
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+}
+
+model TrackSession {
+  id                String    @id @default(cuid())
+  workoutId         String    @unique
+  workout           Workout   @relation(fields: [workoutId], references: [id])
+
+  sessionCategory   String
+  exercises         Json
+
+  totalVolume       Float?
+  totalReps         Int?
+  avgIntensity      Float?
+
+  blockWork         Json?
+  hurdleWork        Json?
+  technicalCues     Json?
+
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+}
+
+model StrengthSession {
+  id                String    @id @default(cuid())
+  workoutId         String    @unique
+  workout           Workout   @relation(fields: [workoutId], references: [id])
+
+  sessionType       String
+  exercises         Json
+  accessoryWork     Json?
+
+  totalSets         Int?
+  totalReps         Int?
+  totalVolume       Float?
+
+  velocityData      Json?
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+}
+
+model PlyoSession {
+  id                String    @id @default(cuid())
+  workoutId         String    @unique
+  workout           Workout   @relation(fields: [workoutId], references: [id])
+
+  exercises         Json
+  totalContacts     Int
+  intensityLevel    String
+
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+}
+
+model CoreSession {
+  id                String    @id @default(cuid())
+  workoutId         String    @unique
+  workout           Workout   @relation(fields: [workoutId], references: [id])
+
+  coreExercises     Json
+  injuryPrevention  Json?
+  mobilityWork      Json?
+
+  totalDuration     Int?
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+}
+
+model CoolDown {
+  id                String    @id @default(cuid())
+  workoutId         String    @unique
+  workout           Workout   @relation(fields: [workoutId], references: [id])
+
+  coolDownJog       Int?
+  staticStretches   Json?
+
+  foamRolling       Boolean   @default(false)
+  foamRollingAreas  Json?
+
+  breathingWork     Boolean   @default(false)
+  breathingDuration Int?
+
+  coldTherapy       Boolean   @default(false)
+  coldTherapyType   String?
+
+  compression       Boolean   @default(false)
+
+  totalDuration     Int?
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+}
+
+model WorkoutLog {
+  id                  String    @id @default(cuid())
+  workoutId           String    @unique
+  workout             Workout   @relation(fields: [workoutId], references: [id])
+  athleteId           String
+  athlete             Athlete   @relation(fields: [athleteId], references: [id])
+
+  completedAt         DateTime?
+  completionStatus    String
+
+  actualRPE           Int?
+  actualDuration      Int?
+  actualLoad          Float?
+
+  deviationPercent    Float?
+  deviationReason     String?
+
+  energyLevel         Int?
+  technicalFeel       Int?
+  enjoyment           Int?
+
+  athleteNotes        String?
+  coachNotes          String?
+
+  painDuring          Boolean   @default(false)
+  painDetails         String?
+
+  createdAt           DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+// ============================================
+// PART 12: COMPETITION
+// ============================================
+
+model Competition {
+  id                String              @id @default(cuid())
+
+  name              String
+  organizer         String?
+  level             String
+
+  venue             String
+  city              String?
+  country           String?
+  isIndoor          Boolean             @default(false)
+  altitude          Int?
+
+  startDate         DateTime
+  endDate           DateTime?
+
+  travelRequired    Boolean             @default(false)
+  accommodationInfo String?
+  timeZone          String?
+
+  createdAt         DateTime            @default(now())
+
+  athletes          AthleteCompetition[]
+
+  @@index([startDate])
+}
+
+model AthleteCompetition {
+  id                  String              @id @default(cuid())
+  athleteId           String
+  athlete             Athlete             @relation(fields: [athleteId], references: [id])
+  competitionId       String
+  competition         Competition         @relation(fields: [competitionId], references: [id])
+
+  events              Json
+  priority            CompetitionPriority
+  targetPerformance   Json?
+
+  taperDays           Int?
+  taperStartDate      DateTime?
+
+  arrivalDate         DateTime?
+  departureDate       DateTime?
+  acclimatizationDays Int?
+
+  status              String              @default("PLANNED")
+  withdrawalReason    String?
+
+  createdAt           DateTime            @default(now())
+
+  results             CompetitionResult[]
+  taperPlan           TaperPlan?
+  racePrep            RacePreparation?
+
+  @@unique([athleteId, competitionId])
+  @@index([athleteId])
+}
+
+model CompetitionResult {
+  id                    String              @id @default(cuid())
+  athleteCompetitionId  String
+  athleteCompetition    AthleteCompetition  @relation(fields: [athleteCompetitionId], references: [id])
+  athleteId             String
+  athlete               Athlete             @relation(fields: [athleteId], references: [id])
+
+  eventType             EventType
+  round                 String?
+
+  performance           Float
+  wind                  Float?
+  position              Int?
+
+  splits                Json?
+  reactionTime          Float?
+
+  isPB                  Boolean             @default(false)
+  isSB                  Boolean             @default(false)
+
+  lane                  Int?
+  weather               Json?
+
+  raceNotes             String?
+  technicalNotes        String?
+  tacticalNotes         String?
+
+  raceVideoUrl          String?
+
+  createdAt             DateTime            @default(now())
+
+  @@index([athleteId])
+}
+
+model TaperPlan {
+  id                    String              @id @default(cuid())
+  athleteCompetitionId  String              @unique
+  athleteCompetition    AthleteCompetition  @relation(fields: [athleteCompetitionId], references: [id])
+
+  taperType             String
+  taperLength           Int
+
+  volumeReduction       Json
+  intensityMaintenance  Boolean             @default(true)
+  dailyPlan             Json
+  freshnessChecks       Json?
+  competitionWeekPlan   Json?
+  preRaceDayPlan        String?
+  raceDaySchedule       Json?
+
+  notes                 String?
+
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+}
+
+model RacePreparation {
+  id                    String              @id @default(cuid())
+  athleteCompetitionId  String              @unique
+  athleteCompetition    AthleteCompetition  @relation(fields: [athleteCompetitionId], references: [id])
+
+  preRaceRoutine        Json?
+  warmUpPlan            Json?
+  visualizationScript   String?
+  focusCues             Json?
+  processGoals          Json?
+  raceStrategy          String?
+  pacingPlan            Json?
+  tacticalNotes         String?
+  contingencyPlans      Json?
+  preRaceNutrition      Json?
+  hydrationPlan         Json?
+  equipmentChecklist    Json?
+  postRacePlan          String?
+
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+}
+
+// ============================================
+// PART 13: MENTAL PERFORMANCE
+// ============================================
+
+model MentalSkillAssessment {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+  assessmentDate    DateTime
+
+  motivation        Int?
+  confidence        Int?
+  concentration     Int?
+  anxietyControl    Int?
+  relaxation        Int?
+  visualization     Int?
+  goalsetting       Int?
+  selfTalk          Int?
+  competitiveDesire Int?
+  mentalToughness   Int?
+
+  overallScore      Float?
+
+  strengths         Json?
+  improvements      Json?
+  recommendations   String?
+  assessedBy        String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model GoalSetting {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+
+  goalType          String
+  category          String
+
+  goal              String
+  specificTarget    String?
+
+  deadline          DateTime?
+  phase             String?
+
+  status            String    @default("ACTIVE")
+  progress          Int?
+
+  checkInDates      Json?
+  checkInNotes      Json?
+
+  achievedDate      DateTime?
+  reflectionNotes   String?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([athleteId])
+}
+
+model MentalSessionLog {
+  id                String    @id @default(cuid())
+  athleteId         String
+  sessionDate       DateTime
+
+  sessionType       String
+  duration          Int
+  focus             String?
+  script            String?
+
+  qualityRating     Int?
+  focusRating       Int?
+  insights          String?
+  guidedBy          String?
+
+  createdAt         DateTime  @default(now())
+}
+
+model PressureSimulationLog {
+  id                String    @id @default(cuid())
+  athleteId         String
+  sessionDate       DateTime
+
+  simulationType    String
+  description       String
+
+  performanceResult Float?
+  vsNormalPerf      Float?
+
+  anxietyLevel      Int?
+  focusLevel        Int?
+  executionQuality  Int?
+
+  whatWorked        String?
+  whatToImprove     String?
+
+  createdAt         DateTime  @default(now())
+}
+
+// ============================================
+// PART 14: NUTRITION
+// ============================================
+
+model NutritionPlan {
+  id                String         @id @default(cuid())
+  athleteId         String
+  athlete           Athlete        @relation(fields: [athleteId], references: [id])
+
+  name              String
+  phase             TrainingPhase?
+  startDate         DateTime
+  endDate           DateTime?
+
+  dailyCalories     Int?
+  proteinGrams      Int?
+  proteinPerKg      Float?
+  carbGrams         Int?
+  carbPerKg         Float?
+  fatGrams          Int?
+  fatPerKg          Float?
+
+  dailyWaterLiters  Float?
+  mealFrequency     Int?
+  mealTiming        Json?
+
+  preWorkout        Json?
+  duringWorkout     Json?
+  postWorkout       Json?
+
+  supplementProtocol Json?
+  restrictions      Json?
+  isVegetarian      Boolean        @default(false)
+  isVegan           Boolean        @default(false)
+
+  notes             String?
+  createdBy         String?
+  isActive          Boolean        @default(true)
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([athleteId])
+}
+
+model MealLog {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+
+  logDate           DateTime
+  mealType          String
+  mealTime          DateTime?
+
+  foods             Json
+
+  totalCalories     Int?
+  totalProtein      Float?
+  totalCarbs        Float?
+  totalFat          Float?
+
+  waterMl           Int?
+
+  satietyLevel      Int?
+  energyAfter       Int?
+
+  mealPhotoUrl      String?
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+  @@index([logDate])
+}
+
+model CompetitionNutritionPlan {
+  id                String    @id @default(cuid())
+  athleteId         String
+  competitionId     String?
+
+  carbLoadingDays   Int?
+  carbLoadingPlan   Json?
+  raceWeekPlan      Json?
+  preRaceMeals      Json?
+  duringRace        Json?
+  postRace          Json?
+  hydrationPlan     Json?
+  electrolyteStrategy String?
+
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+}
+
+// ============================================
+// PART 15: RECOVERY
+// ============================================
+
+model RecoveryLog {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+  logDate           DateTime
+
+  sleepProtocolFollowed Boolean @default(false)
+  napTaken          Boolean   @default(false)
+  napDuration       Int?
+
+  foamRolling       Boolean   @default(false)
+  foamRollingDuration Int?
+  foamRollingAreas  Json?
+
+  staticStretching  Boolean   @default(false)
+  stretchingDuration Int?
+
+  massage           Boolean   @default(false)
+  massageType       String?
+  massageDuration   Int?
+
+  coldTherapy       Boolean   @default(false)
+  coldType          String?
+  coldDuration      Int?
+  coldTemperature   Float?
+
+  heatTherapy       Boolean   @default(false)
+  heatType          String?
+  heatDuration      Int?
+
+  contrastTherapy   Boolean   @default(false)
+  contrastProtocol  String?
+
+  compression       Boolean   @default(false)
+  compressionType   String?
+  compressionDuration Int?
+
+  activeRecovery    Boolean   @default(false)
+  activeRecoveryType String?
+  activeRecoveryDuration Int?
+
+  meditation        Boolean   @default(false)
+  meditationDuration Int?
+
+  breathingExercises Boolean  @default(false)
+
+  perceivedBenefit  Int?
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model RecoveryProtocol {
+  id                String    @id @default(cuid())
+
+  name              String
+  description       String?
+
+  triggerConditions Json?
+  applicablePhases  Json?
+  steps             Json
+  totalDuration     Int?
+  researchBasis     String?
+
+  isActive          Boolean   @default(true)
+
+  createdAt         DateTime  @default(now())
+}
+
+// ============================================
+// PART 16: EVENT-SPECIFIC MODULES
+// ============================================
+
+model SprintModule {
+  id                String    @id @default(cuid())
+  athleteId         String    @unique
+
+  reactionTimeAvg   Float?
+  blockSettings     Json?
+  drivePhaseLength  Int?
+
+  transitionPoint   Float?
+
+  maxVelocity       Float?
+  maxVelocityPoint  Float?
+  velocityMaintenance Float?
+
+  speedEndurance100 Float?
+  speedEndurance200 Float?
+  speedEndurance400 Float?
+
+  curveEfficiency   Float?
+
+  currentFocus      String?
+  accelerationCues  Json?
+  maxVelocityCues   Json?
+
+  updatedAt         DateTime  @updatedAt
+}
+
+model HurdleModule {
+  id                String    @id @default(cuid())
+  athleteId         String    @unique
+
+  hurdleEvent       String
+
+  stepsToFirst      Int?
+  firstHurdleTime   Float?
+
+  leadLeg           String?
+  takeoffDistance   Float?
+  landingDistance   Float?
+  hurdleFlightTime  Float?
+
+  stepPattern       Int?
+  interHurdleTime   Float?
+
+  technicalFocus    Json?
+  practiceHeights   Json?
+  spacingProgression Json?
+
+  updatedAt         DateTime  @updatedAt
+}
+
+model DistanceModule {
+  id                String    @id @default(cuid())
+  athleteId         String    @unique
+
+  primaryEvent      String
+
+  vo2max            Float?
+  vVO2max           Float?
+  lactateThreshold  Float?
+  criticalSpeed     Float?
+
+  easyPace          String?
+  tempoPace         String?
+  thresholdPace     String?
+  intervalPace      String?
+  repetitionPace    String?
+
+  weeklyMileage     Float?
+  longRunDistance   Float?
+
+  pacingStrategy    String?
+  kickDistance      Float?
+
+  altitudeExposure  Json?
+
+  updatedAt         DateTime  @updatedAt
+}
+
+model JumpModule {
+  id                String    @id @default(cuid())
+  athleteId         String    @unique
+
+  jumpEvent         String
+
+  approachLength    Float?
+  approachSteps     Int?
+  approachCheckMarks Json?
+  approachPB        Float?
+
+  takeoffFoot       String?
+  takeoffAngle      Float?
+  takeoffVelocity   Float?
+  penultimateStep   Float?
+
+  flightTechnique   String?
+
+  hopDistance       Float?
+  stepDistance      Float?
+  jumpDistance      Float?
+  phaseRatios       Json?
+
+  barApproach       String?
+  floppingTechnique String?
+
+  poleLength        Float?
+  poleStiffness     Float?
+  gripHeight        Float?
+
+  currentFocus      Json?
+
+  updatedAt         DateTime  @updatedAt
+}
+
+model ThrowModule {
+  id                String    @id @default(cuid())
+  athleteId         String    @unique
+
+  throwEvent        String
+  implementWeight   Float
+
+  technique         String?
+  dominantHand      String
+
+  releaseAngle      Float?
+  releaseVelocity   Float?
+  releaseHeight     Float?
+
+  standingThrowPB   Float?
+  powerPositionPB   Float?
+  throwEfficiency   Float?
+
+  preferredSector   String?
+  trainingImplements Json?
+  medBallExercises  Json?
+  currentFocus      Json?
+
+  updatedAt         DateTime  @updatedAt
+}
+
+// ============================================
+// PART 17: REPORTING & ANALYTICS
+// ============================================
+
+model Report {
+  id                String    @id @default(cuid())
+  athleteId         String
+
+  reportType        String
+  title             String
+
+  startDate         DateTime
+  endDate           DateTime
+
+  summary           String?
+  keyMetrics        Json?
+  highlights        Json?
+  concerns          Json?
+  recommendations   Json?
+  chartsData        Json?
+
+  pdfUrl            String?
+  status            String    @default("DRAFT")
+
+  generatedAt       DateTime  @default(now())
+  generatedBy       String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model DashboardConfig {
+  id                String    @id @default(cuid())
+  userId            String
+
+  layout            Json
+  widgets           Json
+
+  defaultAthleteId  String?
+  defaultDateRange  String?
+
+  updatedAt         DateTime  @updatedAt
+}
+
+model AnalyticsSnapshot {
+  id                String    @id @default(cuid())
+  athleteId         String
+  snapshotDate      DateTime
+
+  performanceTrend  Json?
+  loadTrend         Json?
+  acwrTrend         Json?
+  wellnessTrend     Json?
+
+  vsBenchmark       Json?
+  vsPersonalBest    Json?
+  vsPreviousPeriod  Json?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model DataExport {
+  id                String    @id @default(cuid())
+  athleteId         String?
+  requestedBy       String
+
+  exportType        String
+  dataTypes         Json
+  dateRange         Json
+
+  fileUrl           String?
+  fileName          String?
+
+  status            String    @default("PENDING")
+
+  requestedAt       DateTime  @default(now())
+  completedAt       DateTime?
+}
+
+// ============================================
+// PART 18: COMMUNICATION
+// ============================================
+
+model Message {
+  id                String    @id @default(cuid())
+  senderId          String
+  sender            User      @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId        String
+  receiver          User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
+
+  subject           String?
+  content           String
+  attachments       Json?
+
+  isRead            Boolean   @default(false)
+  readAt            DateTime?
+
+  parentMessageId   String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+model Notification {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+
+  type              String
+  category          String
+  title             String
+  message           String
+
+  actionUrl         String?
+  actionLabel       String?
+
+  isRead            Boolean   @default(false)
+  readAt            DateTime?
+
+  scheduledFor      DateTime?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model Reminder {
+  id                String    @id @default(cuid())
+  userId            String
+
+  type              String
+  title             String
+  description       String?
+
+  remindAt          DateTime
+  repeatPattern     String?
+
+  isActive          Boolean   @default(true)
+  isSent            Boolean   @default(false)
+
+  createdAt         DateTime  @default(now())
+
+  @@index([userId])
+  @@index([remindAt])
+}
+
+// ============================================
+// PART 19: ADMINISTRATIVE
+// ============================================
+
+model AttendanceRecord {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+
+  date              DateTime
+  sessionType       String
+
+  status            String
+  checkInTime       DateTime?
+  checkOutTime      DateTime?
+
+  reason            String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+  @@index([date])
+}
+
+model AthleteDocument {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+
+  name              String
+  type              String
+  description       String?
+
+  fileUrl           String
+  fileSize          Int?
+  mimeType          String?
+
+  issueDate         DateTime?
+  expiryDate        DateTime?
+
+  isConfidential    Boolean   @default(false)
+  accessRoles       Json?
+
+  uploadedBy        String
+  uploadedAt        DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model ProgressPhoto {
+  id                String    @id @default(cuid())
+  athleteId         String
+  athlete           Athlete   @relation(fields: [athleteId], references: [id])
+
+  photoDate         DateTime
+  photoType         String
+
+  photoUrl          String
+  thumbnailUrl      String?
+
+  weight            Float?
+  bodyFat           Float?
+
+  notes             String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model AuditLog {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+
+  action            String
+  entityType        String
+  entityId          String
+
+  changes           Json?
+  ipAddress         String?
+  userAgent         String?
+
+  createdAt         DateTime  @default(now())
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id                String    @id @default(cuid())
+  key               String    @unique
+  value             Json
+  description       String?
+
+  updatedAt         DateTime  @updatedAt
+  updatedBy         String?
+}
+
+model ExerciseLibrary {
+  id                String    @id @default(cuid())
+
+  name              String
+  category          String
+  subCategory       String?
+
+  description       String?
+  instructions      String?
+
+  videoUrl          String?
+  imageUrl          String?
+
+  primaryMuscles    Json?
+  secondaryMuscles  Json?
+  equipment         Json?
+
+  difficulty        String?
+  tags              String[]
+
+  isActive          Boolean   @default(true)
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([category])
+}
+
+model DrillLibrary {
+  id                String        @id @default(cuid())
+
+  name              String
+  eventCategory     EventCategory
+  drillType         String
+
+  description       String
+  purpose           String?
+  coachingPoints    Json?
+  commonErrors      Json?
+
+  sets              String?
+  reps              String?
+  distance          String?
+
+  videoUrl          String?
+  imageUrl          String?
+
+  progressions      Json?
+  regressions       Json?
+
+  isActive          Boolean       @default(true)
+
+  createdAt         DateTime      @default(now())
+
+  @@index([eventCategory])
+  @@index([drillType])
+}
+
+// ============================================
+// PART 20: PB PREDICTION & ANALYSIS
+// ============================================
+
+model PBPrediction {
+  id                  String    @id @default(cuid())
+  athleteId           String
+  athlete             Athlete   @relation(fields: [athleteId], references: [id])
+  eventType           EventType
+  predictionDate      DateTime
+
+  currentPB           Float
+  predictedPB         Float
+  bestCaseScenario    Float
+  conservativeScenario Float
+
+  predictionFactors   Json
+  targetDate          DateTime?
+  riskFactors         Json?
+
+  modelVersion        String?
+  confidence          Float?
+
+  actualAchieved      Float?
+  achievedDate        DateTime?
+  predictionAccuracy  Float?
+
+  createdAt           DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model StrengthWeaknessAnalysis {
+  id                  String    @id @default(cuid())
+  athleteId           String
+  athlete             Athlete   @relation(fields: [athleteId], references: [id])
+  analysisDate        DateTime
+  eventType           EventType?
+
+  strengths           Json
+  weaknesses          Json
+
+  primaryLimiter      String
+  primaryLimiterScore Float?
+  secondaryLimiter    String?
+  secondaryLimiterScore Float?
+
+  injuryRisks         Json?
+  priorityOrder       Json
+  trainingRecommendations Json?
+  impactAnalysis      Json?
+
+  createdAt           DateTime  @default(now())
+
+  @@index([athleteId])
+}
+
+model AutoAdjustmentLog {
+  id                  String    @id @default(cuid())
+  workoutId           String
+  athleteId           String
+  adjustmentDate      DateTime
+
+  triggerType         String
+  triggerValue        Float?
+  threshold           Float?
+
+  originalPlan        Json
+  adjustedPlan        Json
+  changes             Json
+
+  volumeReduction     Float?
+  intensityReduction  Float?
+
+  autoApproved        Boolean   @default(true)
+  approvedBy          String?
+
+  createdAt           DateTime  @default(now())
+
+  @@index([athleteId])
+  @@index([adjustmentDate])
+}

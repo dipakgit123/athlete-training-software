@@ -1,0 +1,18 @@
+{
+  "name": "@athlete-system/shared",
+  "version": "1.0.0",
+  "description": "Shared types, configurations, and utilities for Athletics Performance System",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

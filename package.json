@@ -1,0 +1,39 @@
+{
+  "name": "athlete-performance-system",
+  "version": "1.0.0",
+  "description": "World-Class Athletics High Performance System - AI-driven Athlete Performance Management",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "db:generate": "npm run db:generate --workspace=@athlete-system/database",
+    "db:push": "npm run db:push --workspace=@athlete-system/database",
+    "db:migrate": "npm run db:migrate --workspace=@athlete-system/database",
+    "db:studio": "npm run db:studio --workspace=@athlete-system/database",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^1.11.0",
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "athletics",
+    "sports-science",
+    "performance-management",
+    "training",
+    "periodization",
+    "biomechanics"
+  ],
+  "author": "Athlete Performance System",
+  "license": "MIT"
+}

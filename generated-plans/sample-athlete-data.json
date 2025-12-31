@@ -1,0 +1,104 @@
+{
+  "athleteProfile": {
+    "personalInfo": {
+      "firstName": "Rahul",
+      "lastName": "Sharma",
+      "email": "rahul.sharma@athlete.com",
+      "phone": "9876543210",
+      "dateOfBirth": "2002-05-15",
+      "gender": "MALE",
+      "age": 22,
+      "nationality": "Indian",
+      "state": "Maharashtra",
+      "city": "Pune",
+      "club": "Maharashtra Athletics Academy"
+    },
+    "physicalMeasurements": {
+      "height": 178,
+      "weight": 72,
+      "bmi": 22.7,
+      "bodyFatPercentage": 10.5,
+      "leanMass": 64.4,
+      "armLength": 76,
+      "legLength": 92,
+      "wingspan": 182,
+      "footSize": 43,
+      "dominantLeg": "RIGHT",
+      "dominantHand": "RIGHT"
+    },
+    "athleteType": {
+      "athleteCategory": "SPRINTER",
+      "eventCategory": "SPRINTS",
+      "primaryEvent": "100m",
+      "secondaryEvents": ["200m", "4x100m Relay"],
+      "ageCategory": "SENIOR",
+      "trainingAge": 6
+    },
+    "performanceHistory": {
+      "personalBest": "10.85s",
+      "seasonBest": "10.92s",
+      "indoorPB": "6.72s (60m)",
+      "outdoorPB": "10.85s",
+      "currentPerformance": "10.92s",
+      "majorCompetitionResults": "National Championship 2024 - Bronze (100m), State Championship 2024 - Gold"
+    },
+    "testResults": {
+      "speedTests": {
+        "sprint10m": 1.78,
+        "sprint20m": 2.95,
+        "sprint30m": 3.92,
+        "sprint60m": 6.85,
+        "flying20m": 1.95,
+        "flying30m": 2.85
+      },
+      "powerTests": {
+        "verticalJump": 62,
+        "standingLongJump": 295,
+        "cmjHeight": 58,
+        "broadJump": 310,
+        "tripleHop": 780
+      },
+      "strengthTests": {
+        "squat1RM": 150,
+        "frontSquat1RM": 120,
+        "deadlift1RM": 180,
+        "benchPress1RM": 95,
+        "powerClean1RM": 100,
+        "hipThrust1RM": 200
+      },
+      "physiologicalMarkers": {
+        "vo2Max": 52,
+        "restingHeartRate": 52,
+        "maxHeartRate": 198,
+        "lactateThreshold": "4.2 mmol/L"
+      }
+    },
+    "trainingInfo": {
+      "currentCoach": "Coach Rajesh Kumar",
+      "trainingAge": 6,
+      "weeklyTrainingVolume": 18,
+      "trainingFrequencyPerWeek": 6,
+      "strengthTrainingExperience": "ADVANCED",
+      "speedTrainingExperience": "ADVANCED"
+    },
+    "goalsAndTargets": {
+      "targetPB": "10.45s",
+      "targetEvent": "National Inter-State Championship 2025",
+      "competitionDate": "2025-06-15",
+      "shortTermGoals": "Improve reaction time, increase max velocity phase duration, achieve 10.65s by March 2025",
+      "longTermGoals": "Qualify for Asian Games 2026, achieve sub-10.40s, represent India internationally"
+    },
+    "medicalHistory": {
+      "injuryHistory": "Left hamstring strain (2023, fully recovered), mild ankle sprain (2022)",
+      "medicalConditions": "None",
+      "allergies": "None"
+    },
+    "emergencyContact": {
+      "name": "Suresh Sharma",
+      "phone": "9876543211",
+      "relationship": "PARENT"
+    }
+  },
+  "generatedAt": "2025-12-31T10:00:00Z",
+  "planVersion": "1.0"
+}
