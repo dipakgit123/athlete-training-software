@@ -8,6 +8,7 @@ import { Response, NextFunction } from 'express';
 import { prisma } from '../lib/prisma';
 import { NotFoundError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth';
+import { generateTrainingPlanWithAI } from '../services/training-plan-generator.service';
 
 // ==================== Macrocycle ====================
 
@@ -453,6 +454,53 @@ export async function getUpcomingCompetitions(req: AuthRequest, res: Response, n
     res.json({
       success: true,
       data: athleteCompetitions,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Generate AI-powered training plan
+ */
+export async function generateTrainingPlan(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const { athleteId } = req.params;
+
+    // Get athlete data
+    const athlete = await prisma.athlete.findUnique({
+      where: { id: athleteId },
+      include: {
+        user: true,
+        events: true,
+        personalBests: true,
+      },
+    });
+
+    if (!athlete) {
+      throw NotFoundError('Athlete');
+    }
+
+    // Generate training plan using AI
+    const trainingPlan = await generateTrainingPlanWithAI({
+      firstName: athlete.user.firstName,
+      lastName: athlete.user.lastName,
+      dateOfBirth: athlete.dateOfBirth,
+      gender: athlete.gender,
+      height: athlete.height,
+      weight: athlete.weight,
+      trainingAge: athlete.trainingAge,
+      category: athlete.category,
+      primaryEvent: athlete.events.find(e => e.isPrimary)?.eventType || 'Sprint',
+      personalBest: athlete.personalBests[0]?.performance?.toString() || 'N/A',
+      targetPB: req.body.targetPB || 'Improvement',
+      competitionDate: req.body.competitionDate,
+    });
+
+    res.json({
+      success: true,
+      message: 'Training plan generated successfully',
+      data: trainingPlan,
     });
   } catch (error) {
     next(error);

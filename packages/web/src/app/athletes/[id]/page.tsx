@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 import {
   ArrowLeft,
   User,
@@ -295,30 +296,78 @@ export default function AthleteProfilePage() {
   const [showDashboard, setShowDashboard] = useState(false);
 
   useEffect(() => {
-    // First check mock data
-    if (mockAthleteData[athleteId]) {
-      setAthlete(mockAthleteData[athleteId]);
-      setLoading(false);
-      return;
-    }
-
-    // Then check localStorage
-    try {
-      const stored = localStorage.getItem('athletes');
-      if (stored) {
-        const athletes: StoredAthlete[] = JSON.parse(stored);
-        const foundAthlete = athletes.find((a) => a.id === athleteId);
-        if (foundAthlete) {
-          setAthlete(convertStoredAthlete(foundAthlete));
+    const loadAthlete = async () => {
+      // Try to fetch from API first
+      try {
+        const response = await api.getAthlete(athleteId);
+        if (response.success && response.data) {
+          const athleteData = response.data;
+          // Convert API data to display format
+          setAthlete({
+            id: athleteData.id,
+            name: `${athleteData.user?.firstName || ''} ${athleteData.user?.lastName || ''}`.trim(),
+            firstName: athleteData.user?.firstName || '',
+            lastName: athleteData.user?.lastName || '',
+            email: athleteData.user?.email || '',
+            dateOfBirth: athleteData.dateOfBirth?.split('T')[0] || '',
+            gender: athleteData.gender || '',
+            category: athleteData.category || '',
+            nationality: athleteData.nationality || '',
+            height: athleteData.height || 0,
+            weight: athleteData.weight || 0,
+            primaryEvent: athleteData.events?.[0]?.eventType || 'N/A',
+            events: athleteData.events || [],
+            personalBests: athleteData.personalBests || [],
+            goals: athleteData.goals || [],
+            readinessScore: 75 + Math.floor(Math.random() * 20), // TODO: Calculate from wellness data
+            readinessCategory: 'GOOD',
+            hasAlerts: false,
+            alertCount: 0,
+            acwr: 1.0 + (Math.random() * 0.3),
+            weeklyLoad: Math.floor(Math.random() * 500) + 1500,
+            phase: 'GPP',
+            // Add loadMetrics object
+            loadMetrics: {
+              acwr: 1.0 + (Math.random() * 0.3),
+              weeklyLoad: Math.floor(Math.random() * 500) + 1500,
+              monotony: 1.3,
+              strain: 1950,
+            },
+            readiness: {
+              score: 75 + Math.floor(Math.random() * 20),
+              category: 'GOOD',
+              components: {
+                sleep: 75,
+                cardiac: 70,
+                fatigue: 72,
+                mental: 78,
+                hydration: 75,
+              },
+            },
+            currentPhase: 'GPP',
+            weekInPhase: 1,
+            upcomingCompetitions: [],
+            recentSessions: [],
+            alerts: [],
+          });
           setLoading(false);
           return;
         }
+      } catch (error) {
+        console.error('Error loading athlete from API:', error);
       }
-    } catch (error) {
-      console.error('Error loading athlete from localStorage:', error);
-    }
 
-    setLoading(false);
+      // Fall back to mock data if API fails
+      if (mockAthleteData[athleteId]) {
+        setAthlete(mockAthleteData[athleteId]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(false);
+    };
+
+    loadAthlete();
   }, [athleteId]);
 
   if (loading) {
@@ -377,19 +426,30 @@ export default function AthleteProfilePage() {
           </div>
         </div>
 
-        {/* Dashboard Toggle Button */}
-        <button
-          onClick={() => setShowDashboard(!showDashboard)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-            showDashboard
-              ? 'bg-blue-600 text-white'
-              : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-          }`}
-        >
-          <BarChart3 className="w-5 h-5" />
-          {showDashboard ? 'Hide Dashboard' : 'View Performance Dashboard'}
-          {showDashboard ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Edit Button */}
+          <Link
+            href={`/athletes/${athleteId}/edit`}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+          >
+            <Edit className="w-5 h-5" />
+            Edit Profile
+          </Link>
+          
+          {/* Dashboard Toggle Button */}
+          <button
+            onClick={() => setShowDashboard(!showDashboard)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              showDashboard
+                ? 'bg-blue-600 text-white'
+                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+            }`}
+          >
+            <BarChart3 className="w-5 h-5" />
+            {showDashboard ? 'Hide Dashboard' : 'View Performance Dashboard'}
+            {showDashboard ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
       {/* Performance Dashboard (collapsible) */}

@@ -2,7 +2,7 @@
  * API Client for Elite Athletics Performance System
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001/api';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -239,6 +239,32 @@ class ApiClient {
   async acknowledgeAlert(id: string) {
     return this.request<any>(`/alerts/${id}/acknowledge`, {
       method: 'POST',
+    });
+  }
+
+  // ============ GENERIC HTTP METHODS ============
+  async get<T = any>(endpoint: string, params?: Record<string, any>) {
+    const query = params ? '?' + new URLSearchParams(params).toString() : '';
+    return this.request<T>(`${endpoint}${query}`);
+  }
+
+  async post<T = any>(endpoint: string, data?: any) {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async put<T = any>(endpoint: string, data?: any) {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async delete<T = any>(endpoint: string) {
+    return this.request<T>(endpoint, {
+      method: 'DELETE',
     });
   }
 }

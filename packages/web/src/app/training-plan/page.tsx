@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { api } from '@/lib/api';
 
 // ============================================
 // TYPES
@@ -96,6 +97,10 @@ interface GeneratedPlan {
   phases: TrainingPhase[];
   athleteProfile: Athlete;
   generatedAt: string;
+  aiGenerated?: boolean;
+  comprehensivePlan?: string;
+  framework?: string;
+  fallback?: boolean;
 }
 
 // ============================================
@@ -609,12 +614,87 @@ const generateTaperPhase = (athlete: Athlete, startDate: Date, endDate: Date, we
 // ============================================
 
 export default function TrainingPlanPage() {
+  const [athletes, setAthletes] = useState<Athlete[]>(DEMO_ATHLETES);
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<GeneratedPlan | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'phases' | 'weekly' | 'daily'>('overview');
   const [expandedPhase, setExpandedPhase] = useState<number | null>(0);
   const [selectedPhaseForSchedule, setSelectedPhaseForSchedule] = useState<number>(0);
+
+  // Load athletes from database in real-time via API
+  useEffect(() => {
+    const loadAthletes = async () => {
+      try {
+        console.log('🔄 Fetching athletes from database...');
+        const response = await api.getAthletes({ limit: 100 });
+        
+        if (response.success && response.data) {
+          const apiAthletes = Array.isArray(response.data) ? response.data : response.data.athletes || [];
+          
+          if (apiAthletes.length === 0) {
+            console.log('⚠️  No athletes found in database, using mock data');
+            console.log('💡 Once database is seeded, refresh to see real data');
+            setAthletes(DEMO_ATHLETES);
+            return;
+          }
+          
+          // Convert API athletes to the Athlete interface format
+          const formattedAthletes: Athlete[] = apiAthletes.map((athlete: any) => {
+            // Handle different event format from database
+            const eventMap: Record<string, string> = {
+              'M_100': '100m Sprint',
+              'M_200': '200m Sprint',
+              'M_400': '400m Sprint',
+              'M_800': '800m',
+              'M_1500': '1500m',
+              'LONG_JUMP': 'Long Jump',
+              'HIGH_JUMP': 'High Jump',
+              'TRIPLE_JUMP': 'Triple Jump',
+              'SHOT_PUT': 'Shot Put',
+              'JAVELIN': 'Javelin',
+            };
+            
+            return {
+              id: athlete.id || athlete.user?.id,
+              firstName: athlete.user?.firstName || athlete.firstName,
+              lastName: athlete.user?.lastName || athlete.lastName,
+              email: athlete.user?.email || athlete.email || 'N/A',
+              dateOfBirth: athlete.dateOfBirth || '2000-01-01',
+              gender: athlete.gender || 'MALE',
+              primaryEvent: eventMap[athlete.primaryEvent] || athlete.primaryEvent || 'N/A',
+              secondaryEvents: (athlete.secondaryEvents || []).map((e: string) => eventMap[e] || e),
+              competitionLevel: athlete.competitionLevel || athlete.category || 'SENIOR',
+              nationality: athlete.nationality || 'India',
+              height: athlete.height || 175,
+              weight: athlete.weight || 70,
+              personalBest: athlete.personalBest || 'N/A',
+              targetPB: athlete.targetPB || 'N/A',
+              competitionDate: athlete.competitionDate || new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              trainingAge: athlete.trainingAge || 5,
+              strengths: athlete.strengths || [],
+              weaknesses: athlete.weaknesses || [],
+              injuryHistory: athlete.injuryHistory || [],
+              coachNotes: athlete.coachNotes || athlete.notes || '',
+            };
+          });
+          
+          console.log(`✅ Loaded ${formattedAthletes.length} athletes from database`);
+          setAthletes(formattedAthletes);
+        } else {
+          console.log('⚠️  API returned no data, using mock data');
+          console.log('💡 Once database is seeded, refresh to see real data');
+          setAthletes(DEMO_ATHLETES);
+        }
+      } catch (error) {
+        console.error('❌ Database not available:', error instanceof Error ? error.message : 'Unknown error');
+        console.log('💡 Using mock data - Once database is connected, refresh to see real data');
+        setAthletes(DEMO_ATHLETES);
+      }
+    };
+
+    loadAthletes();
+  }, []);
 
   // Calculate phase dates based on competition date
   const generateFullPlan = (athlete: Athlete): TrainingPhase[] => {
@@ -660,36 +740,138 @@ export default function TrainingPlanPage() {
     ];
   };
 
-  // Generate training plan
+  // Generate training plan using AI API
   const handleGeneratePlan = async () => {
     if (!selectedAthlete) return;
 
     setIsGenerating(true);
 
-    // Simulate AI processing delay
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    try {
+      console.log('🚀 Calling API to generate training plan...');
+      
+      // Call the API endpoint to generate plan with Gemini AI
+      const response = await api.post(`/planning/generate/${selectedAthlete.id}`, {
+        targetPB: selectedAthlete.targetPB,
+        competitionDate: selectedAthlete.competitionDate,
+      });
 
-    const phases = generateFullPlan(selectedAthlete);
-    const totalWeeks = phases.reduce((sum, p) => sum + p.durationWeeks, 0);
+      console.log('✅ Full API response:', response);
 
-    const plan: GeneratedPlan = {
-      athleteName: `${selectedAthlete.firstName} ${selectedAthlete.lastName}`,
-      event: selectedAthlete.primaryEvent,
-      eventCategory: selectedAthlete.primaryEvent.includes('Jump') ? 'Jumps' : 'Sprints',
-      targetCompetition: 'Target Competition 2025',
-      competitionDate: selectedAthlete.competitionDate,
-      currentPB: selectedAthlete.personalBest,
-      targetPB: selectedAthlete.targetPB,
-      trainingAge: selectedAthlete.trainingAge,
-      totalWeeks: totalWeeks,
-      phases: phases,
-      athleteProfile: selectedAthlete,
-      generatedAt: new Date().toISOString(),
-    };
+      // Handle response structure - API returns { success, message, data }
+      if (response.success && response.data) {
+        const aiPlanData = response.data;
+        console.log('✅ Received AI-generated plan:', aiPlanData);
 
-    setGeneratedPlan(plan);
-    setIsGenerating(false);
-    setActiveTab('phases');
+        // Check if we have phases in the response
+        if (aiPlanData.phases && Array.isArray(aiPlanData.phases)) {
+          console.log('📊 Structured JSON plan received with phases');
+          
+          // Calculate dates for each phase based on competition date
+          const compDate = new Date(selectedAthlete.competitionDate);
+          let currentDate = new Date();
+          currentDate.setDate(currentDate.getDate() + 7); // Start next week
+          
+          // Add dates and Marathi names to phases
+          const phasesWithDates = aiPlanData.phases.map((phase: any, index: number) => {
+            const phaseStart = new Date(currentDate);
+            const phaseEnd = new Date(currentDate);
+            phaseEnd.setDate(phaseEnd.getDate() + (phase.durationWeeks * 7) - 1);
+            
+            // Update current date for next phase
+            currentDate = new Date(phaseEnd);
+            currentDate.setDate(currentDate.getDate() + 1);
+            
+            // Add Marathi translations for phase names
+            const marathiNames: Record<string, string> = {
+              'General Preparation Phase (GPP)': 'सामान्य तयारी फेज (GPP)',
+              'Specific Preparation Phase (SPP)': 'विशिष्ट तयारी फेज (SPP)',
+              'Pre-Competition Phase': 'प्री-कॉम्पिटिशन फेज',
+              'Competition/Taper Phase': 'कॉम्पिटिशन / टेपर फेज',
+            };
+            
+            return {
+              ...phase,
+              startDate: phaseStart.toISOString().split('T')[0],
+              endDate: phaseEnd.toISOString().split('T')[0],
+              nameMarathi: marathiNames[phase.name] || phase.name,
+            };
+          });
+
+          const plan: GeneratedPlan = {
+            athleteName: `${selectedAthlete.firstName} ${selectedAthlete.lastName}`,
+            event: selectedAthlete.primaryEvent,
+            eventCategory: selectedAthlete.primaryEvent.includes('Jump') ? 'Jumps' : 'Sprints',
+            targetCompetition: 'Target Competition 2026',
+            competitionDate: selectedAthlete.competitionDate,
+            currentPB: selectedAthlete.personalBest,
+            targetPB: selectedAthlete.targetPB,
+            trainingAge: selectedAthlete.trainingAge,
+            totalWeeks: aiPlanData.totalWeeks || phasesWithDates.reduce((sum: number, p: any) => sum + p.durationWeeks, 0),
+            phases: phasesWithDates,
+            athleteProfile: selectedAthlete,
+            generatedAt: aiPlanData.generatedAt || new Date().toISOString(),
+            aiGenerated: true,
+            generatedBy: aiPlanData.generatedBy || 'AI Generator',
+          };
+
+          setGeneratedPlan(plan);
+          setActiveTab('phases');
+        } else {
+          // Fallback to local generation
+          console.log('⚠️ No phases in response, using local generation');
+          const phases = generateFullPlan(selectedAthlete);
+          const totalWeeks = phases.reduce((sum, p) => sum + p.durationWeeks, 0);
+
+          const plan: GeneratedPlan = {
+            athleteName: `${selectedAthlete.firstName} ${selectedAthlete.lastName}`,
+            event: selectedAthlete.primaryEvent,
+            eventCategory: selectedAthlete.primaryEvent.includes('Jump') ? 'Jumps' : 'Sprints',
+            targetCompetition: 'Target Competition 2026',
+            competitionDate: selectedAthlete.competitionDate,
+            currentPB: selectedAthlete.personalBest,
+            targetPB: selectedAthlete.targetPB,
+            trainingAge: selectedAthlete.trainingAge,
+            totalWeeks: totalWeeks,
+            phases: phases,
+            athleteProfile: selectedAthlete,
+            generatedAt: new Date().toISOString(),
+          };
+
+          setGeneratedPlan(plan);
+          setActiveTab('phases');
+        }
+      } else {
+        throw new Error('Invalid API response');
+      }
+    } catch (error) {
+      console.error('❌ Error generating plan with API:', error);
+      
+      // Fallback to local generation if API fails
+      console.log('🔄 Falling back to local plan generation...');
+      const phases = generateFullPlan(selectedAthlete);
+      const totalWeeks = phases.reduce((sum, p) => sum + p.durationWeeks, 0);
+
+      const plan: GeneratedPlan = {
+        athleteName: `${selectedAthlete.firstName} ${selectedAthlete.lastName}`,
+        event: selectedAthlete.primaryEvent,
+        eventCategory: selectedAthlete.primaryEvent.includes('Jump') ? 'Jumps' : 'Sprints',
+        targetCompetition: 'Target Competition 2026',
+        competitionDate: selectedAthlete.competitionDate,
+        currentPB: selectedAthlete.personalBest,
+        targetPB: selectedAthlete.targetPB,
+        trainingAge: selectedAthlete.trainingAge,
+        totalWeeks: totalWeeks,
+        phases: phases,
+        athleteProfile: selectedAthlete,
+        generatedAt: new Date().toISOString(),
+        fallback: true,
+      };
+
+      setGeneratedPlan(plan);
+      setActiveTab('phases');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Download plan as PDF
@@ -1024,6 +1206,54 @@ export default function TrainingPlanPage() {
         )}
       </div>
 
+      {/* Loading Overlay for AI Generation */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <Loader2 className="w-16 h-16 animate-spin text-blue-600" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  Generating Training Plan with AI
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Using 13-Step Elite Coaching Framework
+                </p>
+                <div className="space-y-2 text-sm text-gray-500">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                    <span>Analyzing athlete profile & test results</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse delay-100"></div>
+                    <span>Creating periodized phase structure</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse delay-200"></div>
+                    <span>Designing daily workout sessions</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-2 h-2 bg-orange-600 rounded-full animate-pulse delay-300"></div>
+                    <span>Calculating target times & loads</span>
+                  </div>
+                </div>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-blue-600 via-purple-600 to-green-600 animate-pulse"></div>
+              </div>
+              <p className="text-xs text-gray-400 text-center">
+                This may take 15-30 seconds. Please don't close this window.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Athlete Selection */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -1032,7 +1262,7 @@ export default function TrainingPlanPage() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {DEMO_ATHLETES.map((athlete) => (
+          {athletes.map((athlete) => (
             <div
               key={athlete.id}
               onClick={() => setSelectedAthlete(athlete)}
@@ -1125,17 +1355,17 @@ export default function TrainingPlanPage() {
             <button
               onClick={handleGeneratePlan}
               disabled={isGenerating}
-              className="mt-4 w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="mt-4 w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-lg transition-all"
             >
               {isGenerating ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Generating Periodized Plan...
+                  Generating AI Training Plan...
                 </>
               ) : (
                 <>
                   <Play className="w-5 h-5" />
-                  Generate Phase-Wise Training Plan
+                  🤖 Generate AI Training Plan (13-Step Framework)
                 </>
               )}
             </button>

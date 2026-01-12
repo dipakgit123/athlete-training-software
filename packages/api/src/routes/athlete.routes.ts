@@ -11,9 +11,6 @@ import * as athleteController from '../controllers/athlete.controller';
 
 const router = Router();
 
-// All routes require authentication
-router.use(authenticate);
-
 // Validation schemas
 const athleteQuerySchema = z.object({
   search: z.string().optional(),
@@ -22,23 +19,72 @@ const athleteQuerySchema = z.object({
   ...commonSchemas.pagination.shape,
 });
 
-// Routes
+const createAthleteSchema = z.object({
+  // User data
+  email: z.string().email(),
+  password: z.string().min(6).optional(),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  phone: z.string().optional(),
+  
+  // Athlete basic info
+  dateOfBirth: z.string().or(z.date()),
+  gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
+  nationality: z.string().optional(),
+  height: z.number().or(z.string()).optional(),
+  weight: z.number().or(z.string()).optional(),
+  bodyFatPercentage: z.number().or(z.string()).optional(),
+  armSpan: z.number().or(z.string()).optional(),
+  legLength: z.number().or(z.string()).optional(),
+  category: z.enum(['SUB_JUNIOR', 'JUNIOR', 'YOUTH', 'SENIOR', 'MASTERS']).default('YOUTH'),
+  dominantLeg: z.enum(['LEFT', 'RIGHT', 'AMBIDEXTROUS']).optional(),
+  dominantHand: z.enum(['LEFT', 'RIGHT', 'AMBIDEXTROUS']).optional(),
+  trainingAge: z.number().or(z.string()).optional(),
+  coachId: z.string().optional(),
+  trainingGroupId: z.string().optional(),
+  
+  // Medical
+  medicalClearance: z.boolean().optional(),
+  antiDopingStatus: z.string().optional(),
+  
+  // Optional related data
+  events: z.array(z.object({
+    eventType: z.string(),
+    eventCategory: z.string(),
+    isPrimary: z.boolean().optional(),
+  })).optional(),
+  personalBests: z.array(z.any()).optional(),
+  goals: z.array(z.any()).optional(),
+  documents: z.array(z.any()).optional(),
+});
+
+// Routes - All public for now (authentication disabled)
 /**
  * @route   GET /api/athletes
  * @desc    Get all athletes (with pagination and filters)
- * @access  Private (Coach, Admin)
+ * @access  Public
  */
 router.get(
   '/',
-  authorize(['COACH', 'ADMIN']),
   validateRequest({ query: athleteQuerySchema }),
   athleteController.getAllAthletes
 );
 
 /**
+ * @route   POST /api/athletes
+ * @desc    Create new athlete
+ * @access  Public (temporarily)
+ */
+router.post(
+  '/',
+  validateRequest({ body: createAthleteSchema }),
+  athleteController.createAthlete
+);
+
+/**
  * @route   GET /api/athletes/:id
  * @desc    Get athlete by ID
- * @access  Private
+ * @access  Public
  */
 router.get(
   '/:id',
@@ -49,7 +95,7 @@ router.get(
 /**
  * @route   PUT /api/athletes/:id
  * @desc    Update athlete profile
- * @access  Private (Coach, Admin, Self)
+ * @access  Public (temporarily)
  */
 router.put(
   '/:id',
@@ -60,7 +106,7 @@ router.put(
 /**
  * @route   GET /api/athletes/:id/summary
  * @desc    Get athlete summary with recent metrics
- * @access  Private
+ * @access  Public
  */
 router.get(
   '/:id/summary',
@@ -71,7 +117,7 @@ router.get(
 /**
  * @route   GET /api/athletes/:id/personal-bests
  * @desc    Get athlete personal bests
- * @access  Private
+ * @access  Public
  */
 router.get(
   '/:id/personal-bests',
@@ -82,11 +128,10 @@ router.get(
 /**
  * @route   POST /api/athletes/:id/personal-bests
  * @desc    Add a personal best record
- * @access  Private (Coach, Admin)
+ * @access  Public (temporarily)
  */
 router.post(
   '/:id/personal-bests',
-  authorize(['COACH', 'ADMIN']),
   validateRequest({ params: commonSchemas.idParam }),
   athleteController.addPersonalBest
 );
@@ -94,7 +139,7 @@ router.post(
 /**
  * @route   GET /api/athletes/:id/goals
  * @desc    Get athlete goals
- * @access  Private
+ * @access  Public
  */
 router.get(
   '/:id/goals',
@@ -105,7 +150,7 @@ router.get(
 /**
  * @route   POST /api/athletes/:id/goals
  * @desc    Set athlete goal
- * @access  Private
+ * @access  Public (temporarily)
  */
 router.post(
   '/:id/goals',

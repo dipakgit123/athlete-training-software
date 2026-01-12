@@ -389,6 +389,7 @@ model Athlete {
   documents           AthleteDocument[]
   progressPhotos      ProgressPhoto[]
   attendanceRecords   AttendanceRecord[]
+  exerciseCompletions ExerciseCompletionLog[]
 
   @@index([coachId])
   @@index([category])
@@ -1477,8 +1478,71 @@ model WorkoutLog {
   createdAt           DateTime  @default(now())
 
   @@index([athleteId])
+
+  exerciseCompletions ExerciseCompletionLog[]
 }
 
+// ============================================
+// EXERCISE COMPLETION TRACKING
+// ============================================
+
+model ExerciseCompletionLog {
+  id                  String      @id @default(cuid())
+  workoutLogId        String
+  workoutLog          WorkoutLog  @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
+  athleteId           String
+  athlete             Athlete     @relation(fields: [athleteId], references: [id])
+
+  // Exercise identification
+  exerciseName        String
+  exerciseCategory    String      // TRACK, STRENGTH, PLYO, CORE, WARMUP, COOLDOWN
+  exerciseOrder       Int         // Order in the workout
+
+  // Planned values
+  plannedSets         Int?
+  plannedReps         Int?
+  plannedWeight       Float?      // In kg
+  plannedDistance     Float?      // In meters
+  plannedDuration     Int?        // In seconds
+  plannedIntensity    String?     // e.g., "75%", "Race pace", "Easy"
+  plannedRecovery     Int?        // Recovery time in seconds
+
+  // Actual completed values
+  completedSets       Int?
+  completedReps       Int?
+  completedWeight     Float?
+  completedDistance   Float?
+  completedDuration   Int?
+  completedIntensity  String?
+  actualRecovery      Int?
+
+  // Completion metrics
+  completionPercent   Float?      // Percentage of planned work completed
+  isFullyCompleted    Boolean     @default(false)
+  isPartiallyCompleted Boolean    @default(false)
+  isSkipped           Boolean     @default(false)
+  skipReason          String?
+
+  // Quality metrics
+  technicalQuality    Int?        // 1-10 rating
+  effortLevel         Int?        // 1-10 RPE for this exercise
+  painLevel           Int?        // 0-10 pain scale
+
+  // Timing
+  actualTimes         Json?       // Array of split times for track work
+  bestTime            Float?      // Best rep/set time
+
+  // Notes
+  athleteNotes        String?
+  coachFeedback       String?
+
+  loggedAt            DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([workoutLogId])
+  @@index([athleteId])
+  @@index([exerciseCategory])
+}
 // ============================================
 // PART 12: COMPETITION
 // ============================================

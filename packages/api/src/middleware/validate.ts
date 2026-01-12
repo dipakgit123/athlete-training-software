@@ -100,7 +100,7 @@ export const commonSchemas = {
 
   // ID parameter
   idParam: z.object({
-    id: z.string().uuid('Invalid ID format'),
+    id: z.string().min(1, 'ID is required'),
   }),
 
   // Date range

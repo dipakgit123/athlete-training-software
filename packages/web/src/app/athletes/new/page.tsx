@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 import {
   ArrowLeft,
   User,
@@ -306,38 +307,49 @@ export default function AddAthletePage() {
     setIsSubmitting(true);
 
     try {
-      // Generate unique ID
-      const athleteId = `athlete_${Date.now()}`;
-
-      // Create athlete object
-      const newAthlete = {
-        id: athleteId,
-        ...formData,
-        bloodReport: bloodReportData,
-        createdAt: new Date().toISOString(),
-        // Calculate readiness score (random for now, will be calculated from actual data later)
-        readinessScore: Math.floor(Math.random() * 30) + 70,
-        readinessCategory: 'GOOD',
-        hasAlerts: false,
-        alertCount: 0,
-        acwr: 1.0 + (Math.random() * 0.3),
-        weeklyLoad: Math.floor(Math.random() * 500) + 1500,
-        phase: 'GPP',
+      // Prepare data for API
+      const athleteData = {
+        // User data
+        email: formData.email,
+        password: 'athlete123', // Default password - should be changed on first login
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone || '',
+        
+        // Athlete basic info
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender,
+        nationality: formData.nationality || '',
+        height: formData.height ? parseFloat(formData.height.toString()) : undefined,
+        weight: formData.weight ? parseFloat(formData.weight.toString()) : undefined,
+        bodyFatPercentage: formData.bodyFatPercentage ? parseFloat(formData.bodyFatPercentage.toString()) : undefined,
+        armSpan: formData.armSpan ? parseFloat(formData.armSpan.toString()) : undefined,
+        legLength: formData.legLength ? parseFloat(formData.legLength.toString()) : undefined,
+        category: formData.category,
+        dominantLeg: formData.dominantLeg,
+        dominantHand: formData.dominantHand,
+        trainingAge: formData.trainingAge ? parseInt(formData.trainingAge.toString()) : 0,
+        
+        // Medical
+        medicalClearance: formData.medicalClearance !== false,
+        antiDopingStatus: formData.antiDopingStatus || 'CLEAR',
+        
+        // Events - map to proper format
+        events: formData.primaryEvent ? [{
+          eventType: formData.primaryEvent,
+          eventCategory: formData.eventCategory,
+          isPrimary: true,
+        }] : [],
+        
+        // Optional related data
+        personalBests: formData.personalBests || [],
+        goals: formData.goals || [],
       };
 
-      // Get existing athletes from localStorage
-      const existingAthletes = JSON.parse(localStorage.getItem('athletes') || '[]');
-
-      // Add new athlete
-      existingAthletes.push(newAthlete);
-
-      // Save back to localStorage
-      localStorage.setItem('athletes', JSON.stringify(existingAthletes));
-
-      console.log('Athlete saved:', newAthlete);
-
-      // Small delay for UX
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Save to database via API
+      const response = await api.createAthlete(athleteData);
+      
+      console.log('Athlete created successfully:', response.data);
 
       // Redirect to athletes list
       router.push('/athletes');

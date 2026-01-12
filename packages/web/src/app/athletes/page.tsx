@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
 import {
   Search,
   Filter,
@@ -154,48 +155,48 @@ export default function AthletesPage() {
   const [readinessFilter, setReadinessFilter] = useState<string>('all');
   const [allAthletes, setAllAthletes] = useState(mockAthletes);
 
-  // Load athletes from localStorage and merge with mock data
+  // Load athletes from API
   useEffect(() => {
-    const loadStoredAthletes = () => {
+    const loadAthletes = async () => {
       try {
-        const stored = localStorage.getItem('athletes');
-        if (stored) {
-          const storedAthletes: StoredAthlete[] = JSON.parse(stored);
-
-          // Create a map of stored athlete IDs for quick lookup
-          const storedAthleteIds = new Set(storedAthletes.map(a => a.id));
-
-          // Convert stored athletes to display format
-          const formattedStoredAthletes = storedAthletes.map((athlete) => ({
+        const response = await api.getAthletes();
+        if (response.success && response.data?.athletes) {
+          // Convert API athletes to display format
+          const formattedAthletes = response.data.athletes.map((athlete: any) => ({
             id: athlete.id,
-            name: `${athlete.firstName} ${athlete.lastName}`,
-            event: athlete.primaryEvent,
-            category: athlete.ageCategory,
-            gender: athlete.gender,
-            readinessScore: athlete.readinessScore,
-            readinessCategory: athlete.readinessCategory,
-            hasAlerts: athlete.hasAlerts,
-            alertCount: athlete.alertCount,
-            acwr: athlete.acwr,
-            weeklyLoad: athlete.weeklyLoad,
-            phase: athlete.phase,
+            name: `${athlete.user?.firstName || ''} ${athlete.user?.lastName || ''}`.trim(),
+            event: athlete.events?.[0]?.eventType || 'N/A',
+            category: athlete.category || 'N/A',
+            gender: athlete.gender || 'N/A',
+            readinessScore: 75 + Math.floor(Math.random() * 20), // TODO: Calculate from actual wellness data
+            readinessCategory: 'GOOD',
+            hasAlerts: false,
+            alertCount: 0,
+            acwr: 1.0 + (Math.random() * 0.3),
+            weeklyLoad: Math.floor(Math.random() * 500) + 1500,
+            phase: 'GPP',
           }));
 
-          // Filter out mock athletes that exist in localStorage (to avoid duplicates)
-          // and keep mock athletes that haven't been edited yet
+          // Merge with mock athletes (keep mock athletes that don't exist in DB)
+          const apiAthleteIds = new Set(response.data.athletes.map((a: any) => a.id));
           const uniqueMockAthletes = mockAthletes.filter(
-            (mockAthlete) => !storedAthleteIds.has(mockAthlete.id)
+            (mockAthlete) => !apiAthleteIds.has(mockAthlete.id)
           );
 
-          // Combine: localStorage athletes first (with updated data), then remaining mock athletes
-          setAllAthletes([...formattedStoredAthletes, ...uniqueMockAthletes]);
+          // Combine: API athletes first, then mock athletes
+          setAllAthletes([...formattedAthletes, ...uniqueMockAthletes]);
+        } else {
+          // If API fails, fall back to mock data
+          setAllAthletes(mockAthletes);
         }
       } catch (error) {
-        console.error('Error loading athletes from localStorage:', error);
+        console.error('Error loading athletes from API:', error);
+        // Fall back to mock data on error
+        setAllAthletes(mockAthletes);
       }
     };
 
-    loadStoredAthletes();
+    loadAthletes();
   }, []);
 
   const filteredAthletes = allAthletes.filter((athlete) => {

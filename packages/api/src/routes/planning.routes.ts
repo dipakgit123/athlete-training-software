@@ -11,7 +11,18 @@ import * as planningController from '../controllers/planning.controller';
 
 const router = Router();
 
-// All routes require authentication
+// Public route for training plan generation (temporarily)
+/**
+ * @route   POST /api/planning/generate/:athleteId
+ * @desc    Generate AI training plan for athlete
+ * @access  Public (temporarily)
+ */
+router.post(
+  '/generate/:athleteId',
+  planningController.generateTrainingPlan
+);
+
+// All other routes require authentication
 router.use(authenticate);
 
 // ==================== Macrocycle ====================

@@ -23,6 +23,7 @@ import planningRoutes from './routes/planning.routes';
 import alertRoutes from './routes/alert.routes';
 import reportRoutes from './routes/report.routes';
 import testingRoutes from './routes/testing.routes';
+import exerciseCompletionRoutes from './routes/exercise-completion.routes';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
@@ -34,7 +35,12 @@ const app = express();
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'http://localhost:3003',
+  ],
   credentials: true,
 }));
 app.use(compression());
@@ -62,6 +68,7 @@ app.use('/api/planning', planningRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/tests', testingRoutes);
+app.use('/api/exercise-completion', exerciseCompletionRoutes);
 
 // Error handling
 app.use(notFound);

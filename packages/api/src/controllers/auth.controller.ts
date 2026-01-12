@@ -4,16 +4,14 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcryptjs';
+import { sign, verify } from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
 import { NotFoundError, BadRequestError, UnauthorizedError } from '../middleware/errorHandler';
+import { AuthRequest } from '../middleware/auth';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'athlete-system-secret-key-2024';
-const JWT_EXPIRES_IN = 60 * 60 * 24 * 7; // 7 days in seconds
-
-// Extended Request type - use Express.Request which has correct user type
-type AuthRequest = Request;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 /**
  * Register a new user
@@ -54,7 +52,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     });
 
     // Generate token
-    const token = jwt.sign(
+    const token = sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
@@ -99,7 +97,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     });
 
     // Generate token
-    const token = jwt.sign(
+    const token = sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
@@ -282,7 +280,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
     // Verify token
     let decoded: any;
     try {
-      decoded = jwt.verify(token, JWT_SECRET);
+      decoded = verify(token, JWT_SECRET);
     } catch (err) {
       throw BadRequestError('Invalid or expired reset token');
     }
@@ -315,7 +313,7 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
 
     let decoded: any;
     try {
-      decoded = jwt.verify(token, JWT_SECRET);
+      decoded = verify(token, JWT_SECRET);
     } catch (err) {
       throw UnauthorizedError('Invalid token');
     }
@@ -329,7 +327,7 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
       throw UnauthorizedError('User not found');
     }
 
-    const newToken = jwt.sign(
+    const newToken = sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
@@ -343,3 +341,4 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
     next(error);
   }
 }
+

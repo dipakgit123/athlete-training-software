@@ -12,3 +12,4 @@ export { default as planningRoutes } from './planning.routes';
 export { default as alertRoutes } from './alert.routes';
 export { default as reportRoutes } from './report.routes';
 export { default as testingRoutes } from './testing.routes';
+export { default as exerciseCompletionRoutes } from './exercise-completion.routes';

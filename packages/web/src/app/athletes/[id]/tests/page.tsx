@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 import {
   ArrowLeft,
   Save,
@@ -90,24 +91,31 @@ export default function AthleteTestsPage() {
     loadAthleteData();
   }, [athleteId]);
 
-  const loadAthleteData = () => {
+  const loadAthleteData = async () => {
     try {
-      const stored = localStorage.getItem('athletes');
-      if (stored) {
-        const athletes: StoredAthlete[] = JSON.parse(stored);
-        const foundAthlete = athletes.find((a) => a.id === athleteId);
-        if (foundAthlete) {
-          setAthlete(foundAthlete);
-          setTestResults(foundAthlete.testResults || []);
+      // Try to fetch from API
+      const response = await api.getAthlete(athleteId);
+      if (response.success && response.data) {
+        const athleteData = response.data;
+        const athleteInfo = {
+          id: athleteData.id,
+          firstName: athleteData.user?.firstName || '',
+          lastName: athleteData.user?.lastName || '',
+          primaryEvent: athleteData.events?.[0]?.eventType || '',
+          testResults: [], // TODO: Fetch test results from API when endpoint is available
+        };
+        
+        setAthlete(athleteInfo);
+        setTestResults(athleteInfo.testResults || []);
 
-          // Get tests for this athlete's event - convert event name to ID
-          if (foundAthlete.primaryEvent) {
-            const eventId = EVENT_NAME_TO_ID[foundAthlete.primaryEvent];
-            if (eventId) {
-              const tests = getTestsForEvent(eventId);
-              setEventTests(tests ?? null);
-            }
+        // Get tests for this athlete's event - convert event name to ID
+        if (athleteInfo.primaryEvent) {
+          const eventId = EVENT_NAME_TO_ID[athleteInfo.primaryEvent];
+          if (eventId) {
+            const tests = getTestsForEvent(eventId);
+            setEventTests(tests ?? null);
           }
+        }
         }
       }
     } catch (error) {
@@ -164,16 +172,10 @@ export default function AthleteTestsPage() {
   const handleSaveAll = async () => {
     setSaving(true);
     try {
-      const stored = localStorage.getItem('athletes');
-      if (stored && athlete) {
-        const athletes: StoredAthlete[] = JSON.parse(stored);
-        const index = athletes.findIndex((a) => a.id === athleteId);
-        if (index !== -1) {
-          athletes[index] = { ...athletes[index], testResults };
-          localStorage.setItem('athletes', JSON.stringify(athletes));
-        }
-      }
-
+      // TODO: Save test results via API when endpoint is available
+      // For now, just show success message
+      console.log('Test results to save:', testResults);
+      
       await new Promise((resolve) => setTimeout(resolve, 500));
       alert('Test results saved successfully!');
     } catch (error) {

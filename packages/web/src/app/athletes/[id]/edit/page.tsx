@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 import {
   ArrowLeft,
   Save,
@@ -439,29 +440,44 @@ export default function EditAthletePage() {
     loadAthleteData();
   }, [athleteId]);
 
-  const loadAthleteData = () => {
-    // First check localStorage for any saved data (including mock athletes that were edited)
+  const loadAthleteData = async () => {
+    // Try to fetch from API
     try {
-      const stored = localStorage.getItem('athletes');
-      if (stored) {
-        const athletes = JSON.parse(stored);
-        const athlete = athletes.find((a: any) => a.id === athleteId);
-        if (athlete) {
-          // Found in localStorage - use this data (includes any blood report data)
-          setFormData({ ...initialFormData, ...athlete });
-          if (athlete.bloodReport) {
-            setBloodReportData(athlete.bloodReport);
-          }
-          setIsMockAthlete(MOCK_ATHLETES[athleteId] !== undefined);
-          setLoading(false);
-          return;
-        }
+      const response = await api.getAthlete(athleteId);
+      if (response.success && response.data) {
+        const athlete = response.data;
+        // Map API data to form data
+        setFormData({
+          ...initialFormData,
+          firstName: athlete.user?.firstName || '',
+          lastName: athlete.user?.lastName || '',
+          email: athlete.user?.email || '',
+          phone: athlete.user?.phone || '',
+          dateOfBirth: athlete.dateOfBirth?.split('T')[0] || '',
+          gender: athlete.gender || '',
+          nationality: athlete.nationality || '',
+          height: athlete.height || '',
+          weight: athlete.weight || '',
+          bodyFatPercentage: athlete.bodyFatPercentage || '',
+          armSpan: athlete.armSpan || '',
+          legLength: athlete.legLength || '',
+          category: athlete.category || '',
+          dominantLeg: athlete.dominantLeg || '',
+          dominantHand: athlete.dominantHand || '',
+          trainingAge: athlete.trainingAge || 0,
+          primaryEvent: athlete.events?.[0]?.eventType || '',
+          personalBests: athlete.personalBests || [],
+          goals: athlete.goals || [],
+        });
+        setIsMockAthlete(false);
+        setLoading(false);
+        return;
       }
     } catch (error) {
-      console.error('Error loading athlete from localStorage:', error);
+      console.error('Error loading athlete from API:', error);
     }
 
-    // If not in localStorage, check if it's a mock athlete (first time loading)
+    // If API fails, check if it's a mock athlete
     if (MOCK_ATHLETES[athleteId]) {
       setFormData({ ...initialFormData, ...MOCK_ATHLETES[athleteId] });
       setIsMockAthlete(true);
@@ -520,42 +536,51 @@ export default function EditAthletePage() {
     }));
   };
 
-  // Save data to localStorage
-  const saveToLocalStorage = async () => {
+  // Save data to API
+  const saveAthleteData = async () => {
     try {
-      const stored = localStorage.getItem('athletes');
-      let athletes = stored ? JSON.parse(stored) : [];
-
-      const index = athletes.findIndex((a: any) => a.id === athleteId);
-
+      // Prepare data for API
       const athleteData = {
-        id: athleteId,
-        ...formData,
-        bloodReport: bloodReportData,
-        // Add default values for display in athlete list
-        readinessScore: 75,
-        readinessCategory: 'GOOD',
-        hasAlerts: false,
-        alertCount: 0,
-        acwr: 1.0,
-        weeklyLoad: 1500,
-        phase: 'GPP',
-        createdAt: new Date().toISOString(),
+        // User data
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone || '',
+        
+        // Athlete basic info
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender,
+        nationality: formData.nationality || '',
+        height: formData.height ? parseFloat(formData.height.toString()) : undefined,
+        weight: formData.weight ? parseFloat(formData.weight.toString()) : undefined,
+        bodyFatPercentage: formData.bodyFatPercentage ? parseFloat(formData.bodyFatPercentage.toString()) : undefined,
+        armSpan: formData.armSpan ? parseFloat(formData.armSpan.toString()) : undefined,
+        legLength: formData.legLength ? parseFloat(formData.legLength.toString()) : undefined,
+        category: formData.category,
+        dominantLeg: formData.dominantLeg,
+        dominantHand: formData.dominantHand,
+        trainingAge: formData.trainingAge ? parseInt(formData.trainingAge.toString()) : 0,
+        
+        // Medical
+        medicalClearance: formData.medicalClearance !== false,
+        antiDopingStatus: formData.antiDopingStatus || 'CLEAR',
+        
+        // Events - map to proper format
+        events: formData.primaryEvent ? [{
+          eventType: formData.primaryEvent,
+          eventCategory: formData.eventCategory || 'SPRINT',
+          isPrimary: true,
+        }] : [],
       };
 
-      if (index !== -1) {
-        // Update existing athlete
-        athletes[index] = {
-          ...athletes[index],
-          ...athleteData,
-        };
-      } else {
-        // Add new athlete (for mock athletes being saved for first time)
-        athletes.push(athleteData);
+      // Update athlete via API
+      const response = await api.updateAthlete(athleteId, athleteData);
+      
+      if (response.success) {
+        console.log('Athlete updated successfully:', response.data);
+        return true;
       }
-
-      localStorage.setItem('athletes', JSON.stringify(athletes));
-      return true;
+      return false;
     } catch (error) {
       console.error('Error saving athlete:', error);
       return false;
@@ -571,7 +596,7 @@ export default function EditAthletePage() {
   // Handle Save & Next - go to next tab
   const handleSaveAndNext = async () => {
     setSaving(true);
-    const saved = await saveToLocalStorage();
+    const saved = await saveAthleteData();
 
     if (saved) {
       const currentIndex = getCurrentTabIndex();
@@ -590,7 +615,7 @@ export default function EditAthletePage() {
     e.preventDefault();
     setSaving(true);
 
-    const saved = await saveToLocalStorage();
+    const saved = await saveAthleteData();
 
     if (saved) {
       await new Promise((resolve) => setTimeout(resolve, 300));
